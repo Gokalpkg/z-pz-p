@@ -1,0 +1,19 @@
+{
+  "name": "oyunbulcam",
+  "version": "1.0.0",
+  "description": "Tower Kick - offline Android climber",
+  "main": "game.js",
+  "scripts": {
+    "sync:www": "node scripts/sync-www.js",
+    "cap:sync": "npm run sync:www && npx cap sync android"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2"
+  }
+}

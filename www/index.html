@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Tower Kick - Infinite Jump</title>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0a1620">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="bootSplash" class="boot-splash">
+    <div class="boot-mark" aria-hidden="true">
+      <div class="boot-tower"></div>
+      <div class="boot-kick"></div>
+    </div>
+    <h1 class="boot-title">TOWER KICK</h1>
+    <p class="boot-sub">Tırman. Zıpla. Rekor kır.</p>
+  </div>
+  <div id="game-container">
+    <!-- Canvas Oyun Alanı -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Oyun İçi HUD -->
+    <div id="hud" class="hud-layer">
+      <div class="hud-top">
+        <div class="score-badge">
+          <span class="score-label">KAT</span>
+          <span id="scoreVal" class="score-number">0</span>
+        </div>
+        <div class="best-badge">
+          <span class="best-label">REKOR</span>
+          <span id="bestVal" class="best-number">0</span>
+        </div>
+        <div class="coin-badge">
+          <span class="coin-icon">💎</span>
+          <span id="coinVal" class="coin-number">0</span>
+        </div>
+        <div id="timeBadge" class="time-badge hidden">
+          <span class="time-icon">⏱️</span>
+          <span id="timeVal" class="time-number">60s</span>
+        </div>
+        <div class="hud-actions">
+          <button id="comfortBtn" class="icon-btn" aria-label="Göz Koruma Modu" title="Göz Koruma Modu">🌙</button>
+          <button id="menuBtn" class="icon-btn" aria-label="Menü / Duraklat">⏸</button>
+          <button id="soundBtn" class="icon-btn" aria-label="Ses Aç/Kapat">🔊</button>
+        </div>
+      </div>
+      
+      <!-- Aktif Güçlendirici (Power-Up) Rozeti -->
+      <div id="activePowerUp" class="active-powerup-badge hidden">
+        <span id="powerUpIcon" class="powerup-icon">🧲</span>
+        <div class="powerup-info">
+          <span id="powerUpName" class="powerup-name">MIKNATIS</span>
+          <div class="powerup-bar-wrap">
+            <div id="powerUpBar" class="powerup-bar-fill"></div>
+          </div>
+        </div>
+        <span id="powerUpTime" class="powerup-time">6s</span>
+      </div>
+
+      <!-- Kombo Göstergesi -->
+      <div id="comboContainer" class="combo-container hidden">
+        <div id="comboText" class="combo-title">SWEET!</div>
+        <div class="combo-bar-wrap">
+          <div id="comboFill" class="combo-bar-fill"></div>
+        </div>
+        <div id="comboMultiplier" class="combo-mult">x2 KOMBO</div>
+      </div>
+
+      <!-- Yükselen Lav Tehlike Uyarısı -->
+      <div id="lavaDanger" class="lava-danger-badge hidden">
+        🔥 DİKKAT: LAV YÜKSELİYOR!
+      </div>
+
+      <!-- Yeni Biyom Keşfi Bildirim Bannerı -->
+      <div id="biomeBanner" class="biome-banner hidden">
+        <span id="biomeIcon" class="biome-icon">🌋</span>
+        <div class="biome-text-wrap">
+          <span class="biome-subtitle">BİYOM KEŞFEDİLDİ!</span>
+          <span id="biomeName" class="biome-title">MAGMA MAĞARASI</span>
+        </div>
+      </div>
+
+      <!-- Yeni Rekor Kırıldı Bannerı -->
+      <div id="recordBrokenBanner" class="record-broken-banner hidden">
+        🏆 YENİ REKOR KIRILDI! 🏆
+      </div>
+    </div>
+
+    <!-- FEVER MODU Kenar Parlama Efekti -->
+    <div id="feverOverlay" class="fever-overlay-layer hidden">
+      <div class="fever-banner-text">🔥 FEVER MODU! x2 ELMAS! 🔥</div>
+    </div>
+
+    <!-- Tam ekran sol / sağ yarı — ok yok -->
+    <div id="touchControls" class="touch-controls-layer">
+      <div id="btnLeft" class="split-half" aria-label="Sol"></div>
+      <div id="btnRight" class="split-half" aria-label="Sağ"></div>
+    </div>
+
+    <!-- Minimal Ana Menü -->
+    <div id="startOverlay" class="screen-overlay start-menu">
+      <div class="overlay-content start-menu-content">
+        <div class="game-logo">
+          <h1 class="logo-main">TOWER<br><span>KICK</span></h1>
+          <p class="menu-tagline">Tırman. Zıpla. Rekor kır.</p>
+        </div>
+
+        <div class="mode-selector-wrap">
+          <div class="mode-buttons">
+            <button class="mode-btn active" data-mode="lava" type="button">Lav</button>
+            <button class="mode-btn" data-mode="classic" type="button">Klasik</button>
+            <button class="mode-btn" data-mode="levels" type="button">Bölüm</button>
+            <button class="mode-btn" data-mode="time_attack" type="button">60s</button>
+            <button class="mode-btn" data-mode="hell" type="button">Cehennem</button>
+          </div>
+        </div>
+
+        <button id="playBtn" class="primary-btn pulse" type="button">OYNA</button>
+        <button id="dailyGiftBtn" class="daily-gift-btn hidden" type="button">Günlük hediye +20 💎</button>
+
+        <div class="menu-action-row">
+          <button id="shopBtn" class="menu-nav-btn" type="button">Mağaza</button>
+          <button id="scoresBtn" class="menu-nav-btn" type="button">Skor</button>
+          <button id="settingsBtn" class="menu-nav-btn" type="button">Ayarlar</button>
+        </div>
+
+        <!-- Gizli referanslar: görev / seri / çark ayarlardan açılır -->
+        <button id="questBtn" class="hidden" type="button" aria-hidden="true"></button>
+        <button id="streakBtn" class="hidden" type="button" aria-hidden="true"></button>
+        <button id="wheelBtn" class="hidden" type="button" aria-hidden="true"></button>
+      </div>
+    </div>
+
+    <!-- Duraklatma / Oyun İçi Menü Ekranı -->
+    <div id="pauseOverlay" class="screen-overlay hidden">
+      <div class="overlay-content menu-box">
+        <h2 class="menu-title">DURAKLATILDI</h2>
+        <div class="result-stats">
+          <div class="stat-card">
+            <span class="stat-title">Bulunduğun Kat</span>
+            <span id="pauseCurrentFloor" class="stat-val">0</span>
+          </div>
+          <div class="stat-card highlight">
+            <span class="stat-title">Rekor</span>
+            <span id="pauseBestFloor" class="stat-val">0</span>
+          </div>
+        </div>
+        <button id="resumeBtn" class="primary-btn">DEVAM ET</button>
+        <button id="inGameRestartBtn" class="secondary-btn">Yeniden Başla</button>
+        <button id="mainMenuBtn" class="secondary-btn">Ana Menü</button>
+        <button id="pauseQuestBtn" class="hidden" type="button" aria-hidden="true"></button>
+      </div>
+    </div>
+
+    <!-- Game Over Ekranı -->
+    <div id="gameOverOverlay" class="screen-overlay hidden">
+      <div class="overlay-content game-over-box">
+        <h2 class="game-over-title">DÜŞTÜN!</h2>
+        
+        <div class="result-stats">
+          <div class="stat-card">
+            <span class="stat-title">Ulaşılan Kat</span>
+            <span id="finalScore" class="stat-val">0</span>
+          </div>
+          <div class="stat-card highlight">
+            <span class="stat-title">En Yüksek Rekor</span>
+            <span id="finalBest" class="stat-val">0</span>
+          </div>
+        </div>
+
+        <p id="deathTip" class="death-tip">Sol/sağ yarıya basıp paddle üstüne kay.</p>
+
+        <div id="nearMissNotice" class="near-miss-banner">
+          🔥 Rekoruna sadece <span id="nearMissDiff">3</span> kat kalmıştı!
+        </div>
+
+        <button id="reviveBtn" class="revive-btn" type="button">
+          <div class="revive-btn-icon">❤️</div>
+          <div class="revive-btn-content">
+            <span class="revive-btn-headline">ÜCRETSİZ DİRİL</span>
+            <span class="revive-btn-sub">Günde 1 kez · +10 kat roket</span>
+          </div>
+        </button>
+
+        <button id="restartBtn" class="secondary-btn">Yeniden Başla</button>
+        <button id="gameOverMenuBtn" class="secondary-btn">Ana Menü</button>
+      </div>
+    </div>
+
+    <div id="tutorialOverlay" class="screen-overlay hidden">
+      <div class="overlay-content menu-box">
+        <h2 class="menu-title">Nasıl oynanır</h2>
+        <p class="tut-line">Sol yarı = sola · Sağ yarı = sağa</p>
+        <p class="tut-line">Paddle’a değ, üstündeki eklentiyi al</p>
+        <p class="tut-line">Biyom değişince yeni eklenti ve zıplama gelir</p>
+        <button id="tutorialOkBtn" class="primary-btn" type="button">Anladım, oyna</button>
+      </div>
+    </div>
+
+    <!-- MAĞAZA / KİŞİSELLEŞTİRME OVERLAY -->
+    <div id="shopOverlay" class="screen-overlay hidden">
+      <div class="overlay-content shop-box">
+        <div class="shop-header">
+          <h2 class="shop-title">🏪 MAĞAZA</h2>
+          <div class="shop-coins-display">
+            <span class="coin-icon">💎</span>
+            <span id="shopCoins" class="shop-coins-val">0</span>
+          </div>
+          <button id="shopCloseBtn" class="shop-close-btn">✕</button>
+        </div>
+
+        <div class="shop-categories">
+          <button class="shop-cat-tab active" data-category="charShape">👤 Model</button>
+          <button class="shop-cat-tab" data-category="wallColor">🧱 Duvar</button>
+          <button class="shop-cat-tab" data-category="charColor">🎨 Renk</button>
+          <button class="shop-cat-tab" data-category="trailStyle">✨ İz</button>
+          <button class="shop-cat-tab" data-category="eyes">👀 Göz</button>
+          <button class="shop-cat-tab" data-category="hats">🎩 Şapka</button>
+        </div>
+
+        <div id="shopGrid" class="shop-grid">
+          <!-- Dinamik olarak JS ile doldurulur -->
+        </div>
+      </div>
+    </div>
+
+    <!-- GÖREVLER / BAŞARIMLAR OVERLAY -->
+    <div id="questOverlay" class="screen-overlay hidden">
+      <div class="overlay-content quest-box">
+        <div class="quest-header">
+          <h2 class="quest-title">🎯 GÜNLÜK GÖREVLER</h2>
+          <button id="questCloseBtn" class="shop-close-btn">✕</button>
+        </div>
+        <p class="quest-desc">Görevleri tamamla, bolca 💎 elmas kazan ve mağazada harca!</p>
+        <div id="questList" class="quest-list">
+          <!-- JS ile dinamik üretilir -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Şans Çarkı / Günlük Ödül Modalı -->
+    <div id="wheelOverlay" class="screen-overlay hidden">
+      <div class="overlay-content menu-box">
+        <div class="shop-header">
+          <h2 class="shop-title">🎁 GÜNLÜK ŞANS ÇARKI</h2>
+          <button id="wheelCloseBtn" class="close-btn">✕</button>
+        </div>
+        <p class="wheel-subtitle">Her gün 1 kez ücretsiz çevir, bolca elmas kazan!</p>
+        <div class="wheel-wrapper">
+          <div class="wheel-pointer">▼</div>
+          <div id="wheelDisc" class="wheel-disc">
+            <div class="wheel-sector" style="--i:0;"><span>+25 💎</span></div>
+            <div class="wheel-sector" style="--i:1;"><span>+50 💎</span></div>
+            <div class="wheel-sector" style="--i:2;"><span>+15 💎</span></div>
+            <div class="wheel-sector" style="--i:3;"><span>+100 💎</span></div>
+            <div class="wheel-sector" style="--i:4;"><span>+35 💎</span></div>
+            <div class="wheel-sector" style="--i:5;"><span>+75 💎</span></div>
+          </div>
+        </div>
+        <button id="spinBtn" class="primary-btn pulse">ÇEVİR!</button>
+        <div id="wheelStatus" class="wheel-status-text">Bugünkü hakkın hazır!</div>
+      </div>
+    </div>
+
+    <!-- Ayarlar Modalı -->
+    <div id="settingsOverlay" class="screen-overlay hidden">
+      <div class="overlay-content menu-box settings-box">
+        <div class="shop-header">
+          <h2 class="shop-title">Ayarlar</h2>
+          <button id="settingsCloseBtn" class="close-btn" type="button">✕</button>
+        </div>
+        <div class="settings-list">
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Müzik</span>
+              <span class="setting-desc">Arka plan melodisi</span>
+            </div>
+            <button id="bgmToggleBtn" class="setting-toggle-btn active" type="button">AÇIK</button>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Ses Efektleri</span>
+              <span class="setting-desc">Zıplama ve sekme</span>
+            </div>
+            <button id="sfxToggleBtn" class="setting-toggle-btn active" type="button">AÇIK</button>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Titreşim</span>
+              <span class="setting-desc">Dokunsal geri bildirim</span>
+            </div>
+            <button id="hapticToggleBtn" class="setting-toggle-btn active" type="button">GÜÇLÜ</button>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Kontrol Hızı</span>
+              <span class="setting-desc">Karakter tepkisi</span>
+            </div>
+            <button id="speedToggleBtn" class="setting-toggle-btn" type="button">NORMAL</button>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Düşük efekt</span>
+              <span class="setting-desc">Titreme ve parçacık azalt</span>
+            </div>
+            <button id="lowFxToggleBtn" class="setting-toggle-btn" type="button">KAPALI</button>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Dokunma Düzeni</span>
+              <span class="setting-desc">Ekran sol/sağ yarısı</span>
+            </div>
+            <button id="touchLayoutBtn" class="setting-toggle-btn" type="button">NORMAL</button>
+          </div>
+
+          <div class="settings-section-label">Klavye Tuşları</div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Sol</span>
+            </div>
+            <button id="bindLeftBtn" class="keybind-btn" type="button" data-bind="left">←</button>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Sağ</span>
+            </div>
+            <button id="bindRightBtn" class="keybind-btn" type="button" data-bind="right">→</button>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Zıpla</span>
+            </div>
+            <button id="bindJumpBtn" class="keybind-btn" type="button" data-bind="jump">Space</button>
+          </div>
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title">Duraklat</span>
+            </div>
+            <button id="bindPauseBtn" class="keybind-btn" type="button" data-bind="pause">Esc</button>
+          </div>
+          <button id="resetBindsBtn" class="secondary-btn settings-reset-binds" type="button">Tuşları Sıfırla</button>
+
+          <div class="settings-section-label">Ödüller</div>
+          <div class="settings-extra-row">
+            <button id="settingsQuestBtn" class="secondary-btn" type="button">Görevler</button>
+            <button id="settingsStreakBtn" class="secondary-btn" type="button">Seri</button>
+            <button id="settingsWheelBtn" class="secondary-btn" type="button">Çark</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bölüm / Seviye Seçim Modalı -->
+    <div id="levelsOverlay" class="screen-overlay hidden">
+      <div class="overlay-content menu-box">
+        <div class="shop-header">
+          <h2 class="shop-title">🏁 BÖLÜMLER</h2>
+          <button id="levelsCloseBtn" class="close-btn">✕</button>
+        </div>
+        <p class="wheel-subtitle">Hedef kata ulaş ve yıldızları topla!</p>
+        <div id="levelsGrid" class="levels-grid">
+          <!-- Dinamik doldurulacak -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Bölüm Tamamlandı Modalı -->
+    <div id="levelClearOverlay" class="screen-overlay hidden">
+      <div class="overlay-content menu-box">
+        <h2 class="menu-title" style="color: #ffe600;">BÖLÜM GEÇİLDİ! 🎉</h2>
+        <div class="stars-row" style="font-size: 32px; margin: 8px 0;">⭐⭐⭐</div>
+        <p id="levelClearText" class="wheel-subtitle">Tebrikler! +30 💎 Kazandın!</p>
+        <button id="nextLevelBtn" class="primary-btn pulse">SONRAKİ BÖLÜM ⏩</button>
+        <button id="levelClearMenuBtn" class="secondary-btn">Bölüm Seçimi</button>
+      </div>
+    </div>
+
+    <!-- 7 Günlük Giriş Serisi Modalı -->
+    <div id="streakOverlay" class="screen-overlay hidden">
+      <div class="overlay-content menu-box">
+        <div class="shop-header">
+          <h2 class="shop-title">📅 GÜNLÜK SERİ ÖDÜLÜ</h2>
+          <button id="streakCloseBtn" class="close-btn">✕</button>
+        </div>
+        <p class="wheel-subtitle">Her gün giriş yap, 7. günde Efsanevi Kozmik Kostümü kap!</p>
+        <div id="streakGrid" class="streak-grid">
+          <!-- JS dinamik üretecek -->
+        </div>
+        <button id="claimStreakBtn" class="primary-btn pulse">BUGÜNKÜ ÖDÜLÜ AL 🎁</button>
+      </div>
+    </div>
+
+    <div id="scoresOverlay" class="screen-overlay hidden">
+      <div class="overlay-content menu-box">
+        <div class="shop-header">
+          <h2 class="shop-title">Skor tablosu</h2>
+          <button id="scoresCloseBtn" class="close-btn" type="button">✕</button>
+        </div>
+        <p class="wheel-subtitle">Bu telefonda en iyi 10 koşu</p>
+        <ol id="scoresList" class="scores-list"></ol>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="game.js?v=3.8"></script>
+  <script>
+    (function () {
+      function tap(id, fn) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var last = 0;
+        var go = function (e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
+          var now = Date.now();
+          if (now - last < 280) return;
+          last = now;
+          fn();
+        };
+        el.addEventListener('touchstart', go, { passive: false });
+        el.addEventListener('click', go);
+      }
+      tap('playBtn', function () {
+        if (window.__towerKickStart) window.__towerKickStart();
+        else if (typeof startGame === 'function') startGame();
+      });
+      tap('shopBtn', function () {
+        if (window.__towerKickShop) window.__towerKickShop();
+      });
+      tap('settingsBtn', function () {
+        if (window.__towerKickSettings) window.__towerKickSettings();
+      });
+      tap('scoresBtn', function () {
+        if (window.__towerKickScores) window.__towerKickScores();
+      });
+    })();
+  </script>
+</body>
+</html>

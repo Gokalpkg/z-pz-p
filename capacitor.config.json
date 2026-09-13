@@ -1,0 +1,9 @@
+{
+  "appId": "com.oyunbulcam.towerkick",
+  "appName": "Tower Kick",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

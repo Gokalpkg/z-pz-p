@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Android build & cache
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/.idea/
+android/*.iml
+android/app/*.iml
+.gradle/
+build/
+
+# APK binaries
+*.apk
+*.aab
+
+# Logs
+*.log

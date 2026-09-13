@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Tower Kick - Infinite Jump",
+  "version": "1.0",
+  "description": "Icy Tower esintili, tek dokunuşla oynanan bağımlılık yapıcı dikey tırmanma ve duvar sekişi mobil oyunu.",
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Tower Kick Oyna",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}
