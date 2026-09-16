@@ -1085,6 +1085,7 @@ const player = {
   wallWarnShown: false,
   onIce: false,
   iceHopTimer: 0,
+  wallKickLockTimer: 0,
 
   reset(startY = 650) {
     this.x = VIRTUAL_WIDTH / 2 - 16;
@@ -1107,6 +1108,7 @@ const player = {
     this.wallWarnShown = false;
     this.onIce = false;
     this.iceHopTimer = 0;
+    this.wallKickLockTimer = 0;
   }
 };
 
@@ -2339,15 +2341,18 @@ function createPlatform(floor, y) {
   if (iceBiome) {
     if (rand < 0.62) type = PLATFORM_TYPES.ICE;
     else if (rand < 0.72) type = PLATFORM_TYPES.MOVING;
-  } else if (floor > 40) {
+  } else if (floor >= 70) {
     if (rand < 0.08) type = PLATFORM_TYPES.SPRING;
     else if (rand < 0.16) type = PLATFORM_TYPES.MOVING;
     else if (rand < 0.22) type = PLATFORM_TYPES.ICE;
     else if (rand < 0.26) type = PLATFORM_TYPES.BOOST;
+  } else if (floor > 40) {
+    if (rand < 0.08) type = PLATFORM_TYPES.SPRING;
+    else if (rand < 0.18) type = PLATFORM_TYPES.MOVING;
+    else if (rand < 0.24) type = PLATFORM_TYPES.BOOST;
   } else if (floor > 20) {
     if (rand < 0.10) type = PLATFORM_TYPES.SPRING;
-    else if (rand < 0.18) type = PLATFORM_TYPES.MOVING;
-    else if (rand < 0.26) type = PLATFORM_TYPES.ICE;
+    else if (rand < 0.20) type = PLATFORM_TYPES.MOVING;
   } else if (floor > 6 && rand < 0.08) {
     type = PLATFORM_TYPES.SPRING;
   }
@@ -2594,23 +2599,28 @@ function collectLootOnPlatform(plat) {
   }
 }
 
-function performWallKick(dir) {
+function performWallKick(dir, manual = false) {
   // dir: -1 sol duvardan sağa doğru, 1 sağ duvardan sola doğru
-  if (player.wallKickCount >= 2) {
-    player.vx = 0;
-    player.vy = Math.max(player.vy, 2);
-    // Aynı duvarda her karede tekrar çağrılmasını engelle (donma / metin spam)
-    player.lastWallKickDir = dir;
-    if (!player.wallWarnShown) {
-      player.wallWarnShown = true;
-      floatingTexts.push(new FloatingText("BASAMAĞA BAS! 🧗", dir === -1 ? player.x + 50 : player.x - 50, player.y, '#ff4444'));
+  if (player.lastWallKickDir === dir) {
+    if (player.wallKickCount >= 2) {
+      player.vx = 0;
+      player.vy = Math.max(player.vy, 2);
+      if (!player.wallWarnShown) {
+        player.wallWarnShown = true;
+        floatingTexts.push(new FloatingText("BASAMAĞA BAS! 🧗", dir === -1 ? player.x + 50 : player.x - 50, player.y, '#ff4444'));
+      }
+      return false;
     }
-    return false;
+  } else {
+    // Farklı duvara geçti - ardışık aynı duvar sayacını sıfırla
+    player.wallKickCount = 0;
+    player.wallWarnShown = false;
   }
 
-  const isPerfect = player.wallContactFrames <= 8;
-  const kickVy = isPerfect ? -17.5 : -15.2;
-  const kickVx = isPerfect ? (dir === -1 ? 7.6 : -7.6) : (dir === -1 ? 6.6 : -6.6);
+  const isPerfect = manual && player.wallContactFrames <= 8;
+  const kickVyBase = isPerfect ? -17.5 : -16.0;
+  const kickVy = isIceWorld() ? kickVyBase * 1.25 : kickVyBase;
+  const kickVx = isPerfect ? (dir === -1 ? 9.8 : -9.8) : (dir === -1 ? 9.2 : -9.2);
 
   player.wallKickCount++;
   player.lastWallKickDir = dir;
@@ -2619,28 +2629,49 @@ function performWallKick(dir) {
   player.rotation = dir === -1 ? 360 : -360;
   player.scaleX = 0.55;
   player.scaleY = 1.5;
+  player.wallKickLockTimer = 12; // Directional momentum lock to ensure clean launch
+  
+  // Duvara yapışmayı önlemek için içeri it
+  const leftBorder = 16;
+  const rightBorder = VIRTUAL_WIDTH - 16 - player.width;
+  if (dir === -1) {
+    player.x = Math.max(player.x, leftBorder + 6);
+  } else {
+    player.x = Math.min(player.x, rightBorder - 6);
+  }
+
+  sounds.wallKick();
+  shake(comfortMode ? 3 : 6);
+  vibrate([25, 30]);
 
   if (isPerfect) {
     sounds.playTone(520, 'sawtooth', 0.22, 1200, 0.35);
-    shake(comfortMode ? 6 : 12);
-    vibrate([25, 35, 30]);
     floatingTexts.push(new FloatingText("⚡ PERFECT KICK! ⚡", player.x + player.width / 2, player.y - 15, '#ffe600'));
-    emitParticles(dir === -1 ? player.x : player.x + player.width, player.y + player.height / 2, 20, '#ffe600', 8);
     shop.addCoins(1);
   } else {
-    sounds.wallKick();
-    shake(comfortMode ? 4 : 8);
-    vibrate([20, 30, 25]);
+    floatingTexts.push(new FloatingText("WALL KICK! ⚡", player.x + player.width / 2, player.y - 15, '#00f0ff'));
   }
 
   if (dir === -1) {
-    emitParticles(player.x, player.y + player.height / 2, 14, '#00f0ff', 6);
+    emitParticles(player.x, player.y + player.height / 2, 16, '#00f0ff', 6);
   } else {
-    emitParticles(player.x + player.width, player.y + player.height / 2, 14, '#ff007f', 6);
+    emitParticles(player.x + player.width, player.y + player.height / 2, 16, '#ff007f', 6);
   }
 
   addCombo(player.x + player.width / 2, player.y);
   return true;
+}
+
+function checkWallKickOnInput(manual = true) {
+  if (currentState !== GAME_STATE.PLAYING || player.isGrounded) return false;
+  const leftBorder = 32;
+  const rightBorder = VIRTUAL_WIDTH - 32 - player.width;
+  if (player.x <= leftBorder) {
+    return performWallKick(-1, manual);
+  } else if (player.x >= rightBorder) {
+    return performWallKick(1, manual);
+  }
+  return false;
 }
 
 // ==========================================
@@ -2655,25 +2686,8 @@ function doJump() {
   }
   if (currentState !== GAME_STATE.PLAYING) return;
 
-  const leftBorder = 26;
-  const rightBorder = VIRTUAL_WIDTH - 26 - player.width;
-  const isTouchingLeft = player.x <= leftBorder;
-  const isTouchingRight = player.x >= rightBorder;
-
-  // Buzul: duvarda kay, zıplama / wall-kick yok
-  const canIceWall = activePowerUp && activePowerUp.type === 'grip';
-  if (isIceWorld() && !canIceWall && !player.isGrounded && (isTouchingLeft || isTouchingRight)) {
+  if (!player.isGrounded && checkWallKickOnInput(true)) {
     return;
-  }
-
-  if (!player.isGrounded && (isTouchingLeft || isTouchingRight)) {
-    if (isTouchingLeft && player.lastWallKickDir !== -1) {
-      performWallKick(-1);
-      return;
-    } else if (isTouchingRight && player.lastWallKickDir !== 1) {
-      performWallKick(1);
-      return;
-    }
   }
 
   if (player.isGrounded || player.coyoteTimer > 0) {
@@ -2682,9 +2696,9 @@ function doJump() {
 
     const speedRatio = Math.abs(player.vx) / player.maxSpeed;
     const isMomentumJump = speedRatio > 0.65;
-    const icePenalty = (isIceWorld() || player.onIce) ? 0.95 : 1;
-    const baseJump = -9.4 * icePenalty;
-    const boost = speedRatio * 2.4 * icePenalty;
+    const jumpMult = (isIceWorld() || player.onIce) ? 1.5 : 1.0;
+    const baseJump = -9.4 * jumpMult;
+    const boost = speedRatio * 2.4 * jumpMult;
     player.vy = baseJump - boost;
     playJumpFx(isMomentumJump);
     if (isMomentumJump) shake(comfortMode ? 2 : 3);
@@ -2846,7 +2860,7 @@ function triggerGameOver(cause = 'lava') {
   const deathCopy = {
     lava: { title: 'LAV YAKALANDI', tip: 'Paddle kaçırma. Sol/sağ yarıya basıp sıradaki tahtaya kay.' },
     miss: { title: 'PADDLE KAÇTI', tip: 'Rastgele basma. Tahta hangi yarıdaysa o tarafa bas.' },
-    ice: { title: 'BUZDA KAYDIN', tip: 'Buzulda duvardan zıplanmaz. Erken dön, 🧤 tutuş eklentisini kap.' },
+    ice: { title: 'BUZDA KAYDIN', tip: 'Buzda zıplama 1.5x daha yüksek! Duvarlardan sekerek yukarı tırman.' },
     time: { title: 'SÜRE BİTTİ', tip: 'Sadece ileri paddle’lara odaklan, geri düşme.' },
     quake: { title: 'DENGE BOZULDU', tip: 'Depremde kısa bas, savrulunca ters yarıya bas.' }
   };
@@ -2951,15 +2965,17 @@ function update() {
   player.rotation *= 0.88;
   if (player.coyoteTimer > 0) player.coyoteTimer--;
 
+  if (player.wallKickLockTimer > 0) player.wallKickLockTimer--;
+
   const iceSlide = isIceWorld() || player.onIce;
   const airControl = player.isGrounded ? 1 : 0.72;
-  if (inputLeft) {
+  if (inputLeft && (player.wallKickLockTimer === 0 || player.lastWallKickDir !== -1)) {
     player.vx -= player.accel * airControl * (iceSlide && player.isGrounded ? 0.45 : 1);
     if (player.vx < -player.maxSpeed) player.vx = -player.maxSpeed;
-  } else if (inputRight) {
+  } else if (inputRight && (player.wallKickLockTimer === 0 || player.lastWallKickDir !== 1)) {
     player.vx += player.accel * airControl * (iceSlide && player.isGrounded ? 0.45 : 1);
     if (player.vx > player.maxSpeed) player.vx = player.maxSpeed;
-  } else {
+  } else if (player.wallKickLockTimer === 0) {
     player.vx *= player.friction;
     if (!iceSlide && Math.abs(player.vx) < 0.08) player.vx = 0;
   }
@@ -2972,18 +2988,16 @@ function update() {
   if (player.x <= leftBorder) {
     player.x = leftBorder;
     player.wallContactFrames++;
-    if (isIceWorld()) {
-      player.vx *= 0.92;
-      if (!player.isGrounded) player.vy = Math.min(player.vy + 0.22, 8);
+    if (!player.isGrounded && player.wallKickLockTimer === 0) {
+      performWallKick(-1);
     } else {
       player.vx = 0;
     }
   } else if (player.x >= rightBorder) {
     player.x = rightBorder;
     player.wallContactFrames++;
-    if (isIceWorld()) {
-      player.vx *= 0.92;
-      if (!player.isGrounded) player.vy = Math.min(player.vy + 0.22, 8);
+    if (!player.isGrounded && player.wallKickLockTimer === 0) {
+      performWallKick(1);
     } else {
       player.vx = 0;
     }
@@ -3151,8 +3165,9 @@ function update() {
           player.onIce = isIceWorld();
           const speedRatio = Math.abs(player.vx) / player.maxSpeed;
           const isMomentumJump = speedRatio > 0.65;
-          const baseJump = -9.4;
-          const boost = speedRatio * 2.4;
+          const jumpMult = isIceWorld() ? 1.5 : 1.0;
+          const baseJump = -9.4 * jumpMult;
+          const boost = speedRatio * 2.4 * jumpMult;
           player.vy = baseJump - boost;
           player.isGrounded = false;
           playJumpFx(isMomentumJump);
@@ -3175,8 +3190,8 @@ function update() {
       player.iceHopTimer--;
       if (player.iceHopTimer <= 0) {
         const speedRatio = Math.abs(player.vx) / player.maxSpeed;
-        const icePenalty = 0.95;
-        player.vy = -9.4 * icePenalty - speedRatio * 2.4 * icePenalty;
+        const jumpMult = 1.5; // Buzlu paddler dahil 1.5x zıplama
+        player.vy = (-9.4 - speedRatio * 2.4) * jumpMult;
         player.isGrounded = false;
         player.onIce = false;
         playJumpFx(speedRatio > 0.65);
@@ -4591,6 +4606,7 @@ function bindSplitHalf(el) {
     const x = e.clientX != null ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : midFallback(e));
     applySplitSteer(x);
     sounds.init();
+    checkWallKickOnInput(true);
   };
   const move = (e) => {
     if (currentState !== GAME_STATE.PLAYING) return;
