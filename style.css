@@ -9,16 +9,18 @@
 }
 
 :root {
-  --bg-dark: #0a1620;
-  --bg-mid: #122636;
-  --neon-cyan: #3de7ff;
-  --neon-pink: #ff4d8d;
-  --neon-yellow: #ffd84d;
-  --neon-green: #3dff9a;
-  --neon-purple: #7c9cff;
-  --text-light: #eef6fb;
-  --card-bg: rgba(12, 28, 40, 0.82);
-  --font-display: "Trebuchet MS", "Segoe UI", sans-serif;
+  --bg-dark: #070913;
+  --bg-mid: #0f172a;
+  --neon-cyan: #00f5ff;
+  --neon-pink: #ff007f;
+  --neon-yellow: #ffe600;
+  --neon-green: #00ffaa;
+  --neon-purple: #a855f7;
+  --text-light: #f8fafc;
+  --card-bg: rgba(15, 23, 42, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-glow: 0 8px 32px 0 rgba(0, 245, 255, 0.12);
+  --font-display: "Impact", "Trebuchet MS", "Segoe UI", sans-serif;
   --font-body: "Segoe UI", "Verdana", sans-serif;
 }
 
@@ -29,9 +31,9 @@ html, body {
 
 body {
   background:
-    radial-gradient(120% 80% at 50% -10%, rgba(61, 231, 255, 0.18), transparent 55%),
-    radial-gradient(90% 60% at 100% 100%, rgba(255, 77, 141, 0.12), transparent 50%),
-    linear-gradient(180deg, #071018 0%, #0a1620 45%, #08131b 100%);
+    radial-gradient(130% 90% at 50% -10%, rgba(0, 245, 255, 0.22), transparent 60%),
+    radial-gradient(100% 70% at 100% 100%, rgba(255, 0, 127, 0.18), transparent 55%),
+    linear-gradient(180deg, #05070e 0%, #0a0f1d 50%, #04060b 100%);
   color: var(--text-light);
   font-family: var(--font-body);
   display: flex;
@@ -100,10 +102,13 @@ canvas#gameCanvas {
 }
 
 .score-badge, .best-badge {
-  background: rgba(15, 17, 26, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(10, 15, 30, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(0, 245, 255, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2);
   padding: 6px 14px;
-  border-radius: 24px;
+  border-radius: 20px;
   display: flex;
   align-items: baseline;
   gap: 6px;
@@ -111,31 +116,36 @@ canvas#gameCanvas {
 
 .score-label, .best-label {
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
   color: #94a3b8;
 }
 
 .score-number {
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 26px;
   color: var(--neon-cyan);
+  text-shadow: 0 0 12px rgba(0, 245, 255, 0.6);
 }
 
 .best-number {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 20px;
   color: var(--neon-yellow);
+  text-shadow: 0 0 10px rgba(255, 230, 0, 0.5);
 }
 
 .coin-badge {
-  background: rgba(15, 17, 26, 0.92);
-  border: 1px solid rgba(0, 255, 170, 0.4);
-  padding: 4px 12px;
-  border-radius: 24px;
+  background: rgba(10, 15, 30, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(0, 255, 170, 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  padding: 5px 14px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .coin-icon {
@@ -461,23 +471,27 @@ body.comfort-mode #game-container {
 }
 
 .menu-nav-btn {
-  padding: 14px 12px;
+  padding: 13px 8px;
   border-radius: 14px;
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #fff;
-  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .menu-nav-btn:active {
-  transform: scale(0.96);
-  background: rgba(61, 231, 255, 0.12);
-  border-color: rgba(61, 231, 255, 0.45);
+  transform: scale(0.95);
+  background: rgba(0, 245, 255, 0.18);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 16px rgba(0, 245, 255, 0.4);
 }
 
 .mode-selector-wrap {
@@ -492,27 +506,31 @@ body.comfort-mode #game-container {
 }
 
 .mode-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   padding: 10px 4px;
-  color: rgba(238, 246, 251, 0.65);
+  color: rgba(248, 250, 252, 0.7);
   font-family: var(--font-body);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
-  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
   white-space: nowrap;
 }
 
 .mode-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.94);
 }
 
 .mode-btn.active {
-  background: rgba(61, 231, 255, 0.16);
-  border-color: rgba(61, 231, 255, 0.7);
+  background: linear-gradient(135deg, rgba(0, 245, 255, 0.25), rgba(168, 85, 247, 0.25));
+  border-color: var(--neon-cyan);
   color: #fff;
+  box-shadow: 0 0 16px rgba(0, 245, 255, 0.35);
 }
 
 .settings-box {
@@ -647,21 +665,23 @@ body:not(.playing) #touchControls {
   width: 100%;
   padding: 16px;
   font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  color: #0b0d14;
-  background: linear-gradient(90deg, var(--neon-cyan), #00ffaa);
-  border: none;
-  border-radius: 16px;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #050b14;
+  background: linear-gradient(135deg, #00f5ff 0%, #00ffaa 50%, #ffe600 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 18px;
   cursor: pointer;
-  box-shadow: 0 6px 25px rgba(0, 240, 255, 0.5);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 8px 30px rgba(0, 245, 255, 0.55), inset 0 2px 2px rgba(255, 255, 255, 0.6);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .primary-btn:active {
   transform: scale(0.96);
-  box-shadow: 0 2px 10px rgba(0, 240, 255, 0.3);
+  box-shadow: 0 3px 12px rgba(0, 245, 255, 0.35);
+  filter: brightness(0.95);
 }
 
 .pulse {
@@ -669,8 +689,8 @@ body:not(.playing) #touchControls {
 }
 
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 6px 25px rgba(61, 231, 255, 0.45); filter: brightness(1); }
-  50% { box-shadow: 0 8px 34px rgba(61, 231, 255, 0.75); filter: brightness(1.06); }
+  0%, 100% { box-shadow: 0 8px 30px rgba(0, 245, 255, 0.5), 0 0 10px rgba(0, 255, 170, 0.3); filter: brightness(1); }
+  50% { box-shadow: 0 10px 42px rgba(0, 245, 255, 0.8), 0 0 22px rgba(255, 230, 0, 0.5); filter: brightness(1.08); }
 }
 
 @keyframes pulseBtn {

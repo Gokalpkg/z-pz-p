@@ -2379,32 +2379,40 @@ const PLATFORM_TYPES = {
 
 function platformGap(floor) {
   const theme = biomeAtFloor(floor).theme;
-  if (theme === 'ice') return 62 + Math.min(floor * 0.08, 10);
-  if (theme === 'plain') return 78 + Math.min(floor * 0.18, 16);
-  return 86 + Math.min(floor * 0.26, 26);
+  // Kesinlikle zıplanabilir, akıcı ve ritmik basamak aralıkları
+  if (theme === 'ice') return 60 + Math.min(floor * 0.05, 8); // Buz zıplaması yüksek olduğu için ideal mesafe
+  if (theme === 'plain') return 68 + Math.min(floor * 0.12, 12);
+  return 72 + Math.min(floor * 0.14, 16);
 }
 
 function createPlatform(floor, y) {
   const theme = biomeAtFloor(floor).theme;
   const iceBiome = theme === 'ice';
-  const minWidth = iceBiome ? 72 : 54;
-  const maxWidth = iceBiome ? 108 : 92;
-  const width = Math.max(minWidth, maxWidth - Math.min(floor * 0.22, iceBiome ? 16 : 30));
-  const minX = 22;
-  const maxX = VIRTUAL_WIDTH - width - 22;
+  
+  // Platform genişlikleri: Daha adil, güvenilir ve net
+  const minWidth = iceBiome ? 68 : 60;
+  const maxWidth = iceBiome ? 96 : 88;
+  const width = Math.max(minWidth, maxWidth - Math.min(floor * 0.15, 18));
+  
+  const minX = 28;
+  const maxX = VIRTUAL_WIDTH - width - 28;
   let x;
+  
   if (floor <= 1) {
     x = VIRTUAL_WIDTH / 2 - width / 2;
-  } else if (iceBiome) {
-    const drift = 36 + Math.random() * 58;
-    const goRight = lastPlatX < VIRTUAL_WIDTH / 2;
-    x = Math.max(minX, Math.min(maxX, lastPlatX + (goRight ? drift : -drift)));
   } else {
-    const goRight = lastPlatX < VIRTUAL_WIDTH / 2;
-    const band = (maxX - minX) * 0.42;
-    x = goRight
-      ? maxX - Math.random() * band
-      : minX + Math.random() * band;
+    // Ritmik ve kestirilebilir parkur: Ardışık basamaklar arasında dengeli zigzag
+    const wasLeft = lastPlatX < VIRTUAL_WIDTH / 2;
+    // Bazen aynı tarafta kalır (%30), çoğunlukla karşı tarafa doğru akar (%70)
+    const switchSide = Math.random() < 0.72;
+    const targetLeft = switchSide ? !wasLeft : wasLeft;
+    
+    if (targetLeft) {
+      x = minX + Math.random() * ((VIRTUAL_WIDTH * 0.44) - minX);
+    } else {
+      x = (VIRTUAL_WIDTH * 0.56) + Math.random() * (maxX - (VIRTUAL_WIDTH * 0.56));
+    }
+    x = Math.max(minX, Math.min(maxX, x));
   }
   lastPlatX = x;
 
@@ -2412,21 +2420,22 @@ function createPlatform(floor, y) {
   const rand = Math.random();
 
   if (iceBiome) {
-    if (rand < 0.62) type = PLATFORM_TYPES.ICE;
-    else if (rand < 0.72) type = PLATFORM_TYPES.MOVING;
+    if (rand < 0.55) type = PLATFORM_TYPES.ICE;
+    else if (rand < 0.70) type = PLATFORM_TYPES.MOVING;
+    else if (rand < 0.80) type = PLATFORM_TYPES.SPRING;
   } else if (floor >= 70) {
-    if (rand < 0.08) type = PLATFORM_TYPES.SPRING;
-    else if (rand < 0.16) type = PLATFORM_TYPES.MOVING;
-    else if (rand < 0.22) type = PLATFORM_TYPES.ICE;
-    else if (rand < 0.26) type = PLATFORM_TYPES.BOOST;
-  } else if (floor > 40) {
-    if (rand < 0.08) type = PLATFORM_TYPES.SPRING;
-    else if (rand < 0.18) type = PLATFORM_TYPES.MOVING;
-    else if (rand < 0.24) type = PLATFORM_TYPES.BOOST;
-  } else if (floor > 20) {
-    if (rand < 0.10) type = PLATFORM_TYPES.SPRING;
-    else if (rand < 0.20) type = PLATFORM_TYPES.MOVING;
-  } else if (floor > 6 && rand < 0.08) {
+    if (rand < 0.14) type = PLATFORM_TYPES.SPRING;
+    else if (rand < 0.28) type = PLATFORM_TYPES.MOVING;
+    else if (rand < 0.36) type = PLATFORM_TYPES.BOOST;
+    else if (rand < 0.42) type = PLATFORM_TYPES.PORTAL;
+  } else if (floor > 30) {
+    if (rand < 0.12) type = PLATFORM_TYPES.SPRING;
+    else if (rand < 0.25) type = PLATFORM_TYPES.MOVING;
+    else if (rand < 0.32) type = PLATFORM_TYPES.BOOST;
+  } else if (floor > 10) {
+    if (rand < 0.12) type = PLATFORM_TYPES.SPRING;
+    else if (rand < 0.22) type = PLATFORM_TYPES.MOVING;
+  } else if (floor > 4 && rand < 0.10) {
     type = PLATFORM_TYPES.SPRING;
   }
 
@@ -2540,13 +2549,16 @@ function generateMorePlatforms() {
       }
     }
 
-    // Temizlik sadece yeni katlar üretildiğinde yapılır (Her karede array üretilmez, kasma önlenir)
-    platforms = platforms.filter(p => p.floor === 0 || (p.y < cameraY + VIRTUAL_HEIGHT + 600 && p.y > cameraY - 1500));
-    gems = gems.filter(g => g.y < cameraY + VIRTUAL_HEIGHT + 600 && !g.collected);
-    powerUps = powerUps.filter(pu => pu.y < cameraY + VIRTUAL_HEIGHT + 600 && !pu.collected);
-    flyingEnemies = flyingEnemies.filter(fe => (!fe.squashed || fe.squashTimer > 0) && fe.y < cameraY + VIRTUAL_HEIGHT + 600 && fe.y > cameraY - 1500);
-    bossEnemies = bossEnemies.filter(b => (!b.defeated || b.defeatTimer > 0) && b.y < cameraY + VIRTUAL_HEIGHT + 600 && b.y > cameraY - 1500);
-    mysteryCrates = mysteryCrates.filter(mc => !mc.broken && mc.y < cameraY + VIRTUAL_HEIGHT + 600 && mc.y > cameraY - 1500);
+    // Temizlik sadece yeni katlar üretildiğinde yapılır:
+    // Alt platformlar geniş bir güvenlik tamponuyla (oyuncunun 25 kat gerisine kadar) saklanır.
+    // Böylece klasik modda veya düşüşlerde asla boşluğa düşülmez, basamaklar yerinde durur!
+    const minSafeFloor = Math.max(0, player.highestFloor - 30);
+    platforms = platforms.filter(p => p.floor >= minSafeFloor || p.floor === 0);
+    gems = gems.filter(g => (g.floor >= minSafeFloor && !g.collected) || g.floor === 0);
+    powerUps = powerUps.filter(pu => (pu.floor >= minSafeFloor && !pu.collected) || pu.floor === 0);
+    flyingEnemies = flyingEnemies.filter(fe => (!fe.squashed || fe.squashTimer > 0) && (fe.floor >= minSafeFloor));
+    bossEnemies = bossEnemies.filter(b => (!b.defeated || b.defeatTimer > 0) && (b.floor >= minSafeFloor));
+    mysteryCrates = mysteryCrates.filter(mc => !mc.broken && (mc.floor >= minSafeFloor));
   }
 }
 
@@ -2694,7 +2706,8 @@ function performWallKick(dir, manual = false) {
   const isPerfect = manual && player.wallContactFrames <= 8;
   const kickVyBase = isPerfect ? -17.5 : -16.0;
   const kickVy = isIceWorld() ? kickVyBase * 1.25 : kickVyBase;
-  const kickVx = isPerfect ? (dir === -1 ? 9.8 : -9.8) : (dir === -1 ? 9.2 : -9.2);
+  // Yatay fırlatma dengeli ve kontrollü (artık aşırı savurmaz):
+  const kickVx = isPerfect ? (dir === -1 ? 5.4 : -5.4) : (dir === -1 ? 4.8 : -4.8);
 
   player.wallKickCount++;
   player.lastWallKickDir = dir;
@@ -2703,7 +2716,7 @@ function performWallKick(dir, manual = false) {
   player.rotation = dir === -1 ? 360 : -360;
   player.scaleX = 0.55;
   player.scaleY = 1.5;
-  player.wallKickLockTimer = 10; // Directional momentum lock to ensure clean launch
+  player.wallKickLockTimer = 5; // Kısa kilitleme: oyuncu havada yön kontrolünü anında geri kazanır
   
   // Duvara yapışmayı önlemek için içeri it
   const leftBorder = 16;
@@ -4071,31 +4084,48 @@ function drawPlatforms() {
     const ph = plat.height * scaleRatio;
 
     let mainColor = '#00f0ff';
+    let glowColor = 'rgba(0, 240, 255, 0.45)';
     if (plat.type === PLATFORM_TYPES.BOOST) {
       mainColor = '#ff0055';
+      glowColor = 'rgba(255, 0, 85, 0.6)';
     } else if (plat.type === PLATFORM_TYPES.SPRING) {
       mainColor = '#ffe600';
+      glowColor = 'rgba(255, 230, 0, 0.55)';
     } else if (plat.type === PLATFORM_TYPES.MOVING) {
       mainColor = '#b5179e';
+      glowColor = 'rgba(181, 23, 158, 0.5)';
     } else if (plat.type === PLATFORM_TYPES.ICE) {
       mainColor = (plat.landed && plat.breakTimer % 4 < 2) ? '#ffffff' : '#a5f3fc';
+      glowColor = 'rgba(165, 243, 252, 0.55)';
     } else if (plat.type === PLATFORM_TYPES.PORTAL) {
       mainColor = '#9d00ff';
+      glowColor = 'rgba(157, 0, 255, 0.6)';
     } else if (plat.type === PLATFORM_TYPES.WIND) {
       mainColor = '#00bcd4';
+      glowColor = 'rgba(0, 188, 212, 0.5)';
     } else if (plat.type === PLATFORM_TYPES.BOMB) {
       mainColor = plat.armed && Math.floor(gameTime * 2) % 2 === 0 ? '#ff0033' : '#334155';
+      glowColor = 'rgba(255, 0, 51, 0.5)';
     } else if (plat.type === PLATFORM_TYPES.GHOST) {
       mainColor = plat.isGhostActive ? 'rgba(168, 85, 247, 0.85)' : 'rgba(168, 85, 247, 0.22)';
+      glowColor = 'rgba(168, 85, 247, 0.3)';
     }
 
+    // Platform Gövdesi (Hafif neon ışıma ve çift katmanlı parlak stil)
+    ctx.save();
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = lowFx ? 0 : 8 * scaleRatio;
     ctx.fillStyle = mainColor;
     ctx.beginPath();
-    ctx.roundRect(px, py, pw, ph, 5 * scaleRatio);
+    ctx.roundRect(px, py, pw, ph, 6 * scaleRatio);
     ctx.fill();
+    ctx.restore();
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
-    ctx.fillRect(px + 4 * scaleRatio, py, pw - 8 * scaleRatio, 2 * scaleRatio);
+    // Üst Kenar Parlaması (Neon highlight line)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+    ctx.beginPath();
+    ctx.roundRect(px + 3 * scaleRatio, py + 1.5 * scaleRatio, pw - 6 * scaleRatio, 2.5 * scaleRatio, 2 * scaleRatio);
+    ctx.fill();
 
     if (plat.type === PLATFORM_TYPES.ICE) {
       ctx.fillStyle = '#7ad4ef';
