@@ -1104,6 +1104,7 @@ const player = {
   onIce: false,
   iceHopTimer: 0,
   wallKickLockTimer: 0,
+  airWallKicks: 0,
 
   reset(startY = 650) {
     this.x = VIRTUAL_WIDTH / 2 - 16;
@@ -1127,6 +1128,7 @@ const player = {
     this.onIce = false;
     this.iceHopTimer = 0;
     this.wallKickLockTimer = 0;
+    this.airWallKicks = 0;
   }
 };
 
@@ -1387,9 +1389,7 @@ function checkBiomeProgression(floor) {
 }
 
 function showBiomeBanner(biome) {
-  biomeHoldTimer = 78;
-  inputLeft = false;
-  inputRight = false;
+  biomeHoldTimer = 0; // ASLA OYUNU DONDURMA: Akıcı ve kesintisiz geçiş
   if (biomeBannerEl) {
     if (biomeIconEl) biomeIconEl.textContent = biome.icon;
     if (biomeNameEl) biomeNameEl.textContent = biome.name;
@@ -1398,7 +1398,7 @@ function showBiomeBanner(biome) {
     setTimeout(() => {
       biomeBannerEl.classList.add('hidden');
       biomeBannerEl.classList.remove('big-reveal');
-    }, 2600);
+    }, 2400);
   }
   floatingTexts.push(new FloatingText(`${biome.icon} ${biome.name}`, VIRTUAL_WIDTH / 2, player.y - 50, biome.particle || '#ffe600'));
 }
@@ -2389,13 +2389,13 @@ function createPlatform(floor, y) {
   const theme = biomeAtFloor(floor).theme;
   const iceBiome = theme === 'ice';
   
-  // Platform genişlikleri: Daha adil, güvenilir ve net
-  const minWidth = iceBiome ? 68 : 60;
-  const maxWidth = iceBiome ? 96 : 88;
-  const width = Math.max(minWidth, maxWidth - Math.min(floor * 0.15, 18));
+  // Platform genişlikleri: Dolgun, sağlam ve zıplaması çok daha tatmin edici arcade blokları (110 - 155px)
+  const minWidth = iceBiome ? 120 : 110;
+  const maxWidth = iceBiome ? 155 : 145;
+  const width = Math.max(minWidth, maxWidth - Math.min(floor * 0.12, 16));
   
-  const minX = 28;
-  const maxX = VIRTUAL_WIDTH - width - 28;
+  const minX = 24;
+  const maxX = VIRTUAL_WIDTH - width - 24;
   let x;
   
   if (floor <= 1) {
@@ -2403,14 +2403,14 @@ function createPlatform(floor, y) {
   } else {
     // Ritmik ve kestirilebilir parkur: Ardışık basamaklar arasında dengeli zigzag
     const wasLeft = lastPlatX < VIRTUAL_WIDTH / 2;
-    // Bazen aynı tarafta kalır (%30), çoğunlukla karşı tarafa doğru akar (%70)
+    // Bazen aynı tarafta kalır (%28), çoğunlukla karşı tarafa doğru akar (%72)
     const switchSide = Math.random() < 0.72;
     const targetLeft = switchSide ? !wasLeft : wasLeft;
     
     if (targetLeft) {
-      x = minX + Math.random() * ((VIRTUAL_WIDTH * 0.44) - minX);
+      x = minX + Math.random() * ((VIRTUAL_WIDTH * 0.40) - minX);
     } else {
-      x = (VIRTUAL_WIDTH * 0.56) + Math.random() * (maxX - (VIRTUAL_WIDTH * 0.56));
+      x = (VIRTUAL_WIDTH * 0.60) - (width * 0.4) + Math.random() * (maxX - (VIRTUAL_WIDTH * 0.60) + (width * 0.4));
     }
     x = Math.max(minX, Math.min(maxX, x));
   }
@@ -2453,7 +2453,7 @@ function createPlatform(floor, y) {
   }
 
   // Güçlendirici (Power-Up) Spawn
-  if (!hasGem && Math.random() < 0.12 && floor > 3) {
+  if (!hasGem && Math.random() * 0.12 && floor > 3) {
     powerUps.push({
       floor,
       x: x + width / 2,
@@ -2469,7 +2469,7 @@ function createPlatform(floor, y) {
     x,
     y,
     width,
-    height: 15,
+    height: 24,
     type,
     vx: type === PLATFORM_TYPES.MOVING ? (Math.random() > 0.5 ? 2.2 : -2.2) : 0,
     broken: false,
@@ -2692,10 +2692,26 @@ function collectLootOnPlatform(plat) {
 
 function performWallKick(dir, manual = false) {
   // dir: -1 sol duvardan sağa doğru, 1 sağ duvardan sola doğru
+
+  // ZORUNLU PLATFORM MEKANİĞİ: Havada maksimum 2 ardışık duvar tekmesi!
+  // Oyuncu 3. kez duvara çarparsa duvardan aşağı kayar ve "PLATFORMA BAS!" uyarısı alır.
+  if (player.airWallKicks >= 2) {
+    if (!player.wallWarnShown) {
+      player.wallWarnShown = true;
+      sounds.fall();
+      shake(comfortMode ? 2 : 4);
+      vibrate(25);
+      floatingTexts.push(new FloatingText("PLATFORMA BAS! 🪜", player.x + player.width / 2, player.y - 15, '#ff3355'));
+    }
+    // Duvara sürtünme: dikey hızı yavaşlat ama yukarı fırlatma
+    player.vy = Math.max(player.vy, 1.2);
+    player.vx = 0;
+    return false;
+  }
+
   if (player.lastWallKickDir !== dir) {
-    // Farklı duvara geçti - sayaç sıfırlanır
+    // Farklı duvara geçti
     player.wallKickCount = 0;
-    player.wallWarnShown = false;
   }
 
   // Duvar tekmesinde grounded durumunu ve buz beklemesini anında kaldır
@@ -2709,6 +2725,7 @@ function performWallKick(dir, manual = false) {
   // Yatay fırlatma dengeli ve kontrollü (artık aşırı savurmaz):
   const kickVx = isPerfect ? (dir === -1 ? 5.4 : -5.4) : (dir === -1 ? 4.8 : -4.8);
 
+  player.airWallKicks++;
   player.wallKickCount++;
   player.lastWallKickDir = dir;
   player.vx = kickVx;
@@ -2909,13 +2926,13 @@ function startGame() {
       if (timeVal) timeVal.textContent = `Hedef: K.${stage.targetFloor}`;
     }
   } else if (selectedMode === GAME_MODES.HELL) {
-    lavaY = 920;
-    lavaSpeed = 0.58;
+    lavaY = 780;
+    lavaSpeed = 0.95;
     if (timeBadge) timeBadge.classList.add('hidden');
   } else {
-    // Normal Lav Modu
-    lavaY = 960;
-    lavaSpeed = 0.48;
+    // Normal Lav Modu (Gerçekçi heyecan ve yetişme)
+    lavaY = 820;
+    lavaSpeed = 0.85;
     if (timeBadge) timeBadge.classList.add('hidden');
   }
 
@@ -3040,10 +3057,6 @@ function closeShop() {
 // ==========================================
 function update() {
   if (currentState !== GAME_STATE.PLAYING) return;
-  if (biomeHoldTimer > 0) {
-    biomeHoldTimer--;
-    return;
-  }
 
   gameTime += 1 / 60;
   applyRunSpeed();
@@ -3135,6 +3148,7 @@ function update() {
         player.hasDoubleJump = false;
         player.lastWallKickDir = 0;
         player.wallKickCount = 0;
+        player.airWallKicks = 0;
         player.wallWarnShown = false;
         player.scaleX = 1.35;
         player.scaleY = 0.7;
@@ -3569,6 +3583,8 @@ function update() {
     player.hasDoubleJump = false;
     player.lastWallKickDir = 0;
     player.wallKickCount = 0;
+    player.airWallKicks = 0;
+    player.wallWarnShown = false;
     player.scaleX = 0.7;
     player.scaleY = 1.4;
 
@@ -3637,15 +3653,15 @@ function update() {
     const isFrozen = activePowerUp && activePowerUp.type === 'freeze';
     if (!isFrozen) {
       const isHell = selectedMode === GAME_MODES.HELL;
-      const levelLavaBoost = selectedMode === GAME_MODES.LEVELS && currentLevelId >= 30 ? 0.28 : 0;
-      const floorFactor = Math.min(player.highestFloor * (isHell ? 0.045 : 0.024), 2.8);
-      const timeFactor = Math.min(gameTime * (isHell ? 0.015 : 0.008), 1.8);
-      const baseSpeed = isHell ? 0.58 : (selectedMode === GAME_MODES.LEVELS ? 0.28 : 0.48);
+      const levelLavaBoost = selectedMode === GAME_MODES.LEVELS && currentLevelId >= 30 ? 0.35 : 0;
+      const floorFactor = Math.min(player.highestFloor * (isHell ? 0.055 : 0.035), 3.2);
+      const timeFactor = Math.min(gameTime * (isHell ? 0.020 : 0.012), 2.2);
+      const baseSpeed = isHell ? 0.95 : (selectedMode === GAME_MODES.LEVELS ? 0.45 : 0.82);
       
-      // Oyuncu lavdan çok uzaklaştığında yetişme (catch-up) ivmesi
+      // Oyuncu lavdan çok uzaklaştığında agresif yetişme (catch-up) ivmesi
       const playerBottom = player.y + player.height;
       const distAbove = lavaY - playerBottom;
-      const catchupSpeed = distAbove > 360 ? Math.min(2.4, (distAbove - 360) * 0.007) : 0;
+      const catchupSpeed = distAbove > 280 ? Math.min(3.8, (distAbove - 280) * 0.012) : 0;
 
       lavaSpeed = baseSpeed + floorFactor + timeFactor + levelLavaBoost + catchupSpeed;
       lavaY -= lavaSpeed;
@@ -4083,143 +4099,176 @@ function drawPlatforms() {
     const pw = plat.width * scaleRatio;
     const ph = plat.height * scaleRatio;
 
-    let mainColor = '#00f0ff';
-    let glowColor = 'rgba(0, 240, 255, 0.45)';
+    let mainColor = '#00e5ff';
+    let darkColor = '#007799';
+    let topTrimColor = '#b3f7ff';
+    let glowColor = 'rgba(0, 229, 255, 0.5)';
+
     if (plat.type === PLATFORM_TYPES.BOOST) {
       mainColor = '#ff0055';
-      glowColor = 'rgba(255, 0, 85, 0.6)';
+      darkColor = '#80002b';
+      topTrimColor = '#ff80aa';
+      glowColor = 'rgba(255, 0, 85, 0.65)';
     } else if (plat.type === PLATFORM_TYPES.SPRING) {
-      mainColor = '#ffe600';
-      glowColor = 'rgba(255, 230, 0, 0.55)';
+      mainColor = '#ffd000';
+      darkColor = '#8c7200';
+      topTrimColor = '#fff3a8';
+      glowColor = 'rgba(255, 208, 0, 0.6)';
     } else if (plat.type === PLATFORM_TYPES.MOVING) {
       mainColor = '#b5179e';
-      glowColor = 'rgba(181, 23, 158, 0.5)';
+      darkColor = '#5c004f';
+      topTrimColor = '#f59feb';
+      glowColor = 'rgba(181, 23, 158, 0.55)';
     } else if (plat.type === PLATFORM_TYPES.ICE) {
-      mainColor = (plat.landed && plat.breakTimer % 4 < 2) ? '#ffffff' : '#a5f3fc';
-      glowColor = 'rgba(165, 243, 252, 0.55)';
+      mainColor = (plat.landed && plat.breakTimer % 4 < 2) ? '#ffffff' : '#72e2f8';
+      darkColor = '#1c748c';
+      topTrimColor = '#e0f9ff';
+      glowColor = 'rgba(114, 226, 248, 0.6)';
     } else if (plat.type === PLATFORM_TYPES.PORTAL) {
-      mainColor = '#9d00ff';
-      glowColor = 'rgba(157, 0, 255, 0.6)';
+      mainColor = '#a855f7';
+      darkColor = '#581c87';
+      topTrimColor = '#e9d5ff';
+      glowColor = 'rgba(168, 85, 247, 0.65)';
     } else if (plat.type === PLATFORM_TYPES.WIND) {
-      mainColor = '#00bcd4';
-      glowColor = 'rgba(0, 188, 212, 0.5)';
+      mainColor = '#06b6d4';
+      darkColor = '#0e4a56';
+      topTrimColor = '#cffafe';
+      glowColor = 'rgba(6, 182, 212, 0.55)';
     } else if (plat.type === PLATFORM_TYPES.BOMB) {
-      mainColor = plat.armed && Math.floor(gameTime * 2) % 2 === 0 ? '#ff0033' : '#334155';
-      glowColor = 'rgba(255, 0, 51, 0.5)';
+      mainColor = plat.armed && Math.floor(gameTime * 2) % 2 === 0 ? '#ff1e40' : '#475569';
+      darkColor = '#1e293b';
+      topTrimColor = plat.armed ? '#ffa4b0' : '#94a3b8';
+      glowColor = 'rgba(255, 30, 64, 0.55)';
     } else if (plat.type === PLATFORM_TYPES.GHOST) {
-      mainColor = plat.isGhostActive ? 'rgba(168, 85, 247, 0.85)' : 'rgba(168, 85, 247, 0.22)';
-      glowColor = 'rgba(168, 85, 247, 0.3)';
+      mainColor = plat.isGhostActive ? 'rgba(168, 85, 247, 0.88)' : 'rgba(168, 85, 247, 0.22)';
+      darkColor = plat.isGhostActive ? '#4c1d95' : 'rgba(76, 29, 149, 0.15)';
+      topTrimColor = plat.isGhostActive ? '#d8b4fe' : 'rgba(216, 180, 254, 0.2)';
+      glowColor = 'rgba(168, 85, 247, 0.35)';
     }
 
-    // Platform Gövdesi (Hafif neon ışıma ve çift katmanlı parlak stil)
+    const cornerR = 7 * scaleRatio;
+
+    // 1. ALT 3D GÖLGE / KALIN TABAN (CHUNKY DEPTH DROP)
+    ctx.fillStyle = darkColor;
+    ctx.beginPath();
+    ctx.roundRect(px, py + ph * 0.35, pw, ph * 0.65, [0, 0, cornerR, cornerR]);
+    ctx.fill();
+
+    // 2. ANA PLATFORM GÖVDESİ (CHUNKY SLAB)
     ctx.save();
     ctx.shadowColor = glowColor;
     ctx.shadowBlur = lowFx ? 0 : 8 * scaleRatio;
     ctx.fillStyle = mainColor;
     ctx.beginPath();
-    ctx.roundRect(px, py, pw, ph, 6 * scaleRatio);
+    ctx.roundRect(px, py, pw, ph * 0.75, [cornerR, cornerR, 3 * scaleRatio, 3 * scaleRatio]);
     ctx.fill();
     ctx.restore();
 
-    // Üst Kenar Parlaması (Neon highlight line)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+    // 3. ÜST KENAR NEON PARLAMA ÇİZGİSİ (NEON CAP STRIP)
+    ctx.fillStyle = topTrimColor;
     ctx.beginPath();
-    ctx.roundRect(px + 3 * scaleRatio, py + 1.5 * scaleRatio, pw - 6 * scaleRatio, 2.5 * scaleRatio, 2 * scaleRatio);
+    ctx.roundRect(px + 3 * scaleRatio, py + 1.5 * scaleRatio, pw - 6 * scaleRatio, 4 * scaleRatio, 2 * scaleRatio);
     ctx.fill();
 
+    // 4. PLATFORM KENAR KORUYUCU DETAYLARI (BOLTS / INSETS)
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.beginPath();
+    ctx.arc(px + 8 * scaleRatio, py + 10 * scaleRatio, 2.2 * scaleRatio, 0, Math.PI * 2);
+    ctx.arc(px + pw - 8 * scaleRatio, py + 10 * scaleRatio, 2.2 * scaleRatio, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Özel Platform İkonları ve Detayları
     if (plat.type === PLATFORM_TYPES.ICE) {
-      ctx.fillStyle = '#7ad4ef';
-      ctx.fillRect(px, py + ph * 0.55, pw, ph * 0.45);
-      ctx.fillStyle = '#e8ffff';
-      const spikes = Math.max(3, Math.floor(plat.width / 18));
+      ctx.fillStyle = '#ffffff';
+      const spikes = Math.max(4, Math.floor(plat.width / 22));
       for (let s = 0; s < spikes; s++) {
         const sx = px + (s + 0.5) * (pw / spikes);
         ctx.beginPath();
-        ctx.moveTo(sx - 3.5 * scaleRatio, py + ph);
-        ctx.lineTo(sx, py + ph + 8 * scaleRatio);
-        ctx.lineTo(sx + 3.5 * scaleRatio, py + ph);
+        ctx.moveTo(sx - 4 * scaleRatio, py + ph);
+        ctx.lineTo(sx, py + ph + 9 * scaleRatio);
+        ctx.lineTo(sx + 4 * scaleRatio, py + ph);
         ctx.fill();
       }
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(px + pw * 0.18, py + 3 * scaleRatio, 3 * scaleRatio, 3 * scaleRatio);
-      ctx.fillRect(px + pw * 0.62, py + 5 * scaleRatio, 2 * scaleRatio, 2 * scaleRatio);
       if (plat.landed) {
-        ctx.strokeStyle = '#0b3a52';
-        ctx.lineWidth = 1.4 * scaleRatio;
+        ctx.strokeStyle = '#05293d';
+        ctx.lineWidth = 2 * scaleRatio;
         ctx.beginPath();
-        ctx.moveTo(px + pw * 0.28, py);
-        ctx.lineTo(px + pw * 0.4, py + ph);
-        ctx.moveTo(px + pw * 0.68, py);
+        ctx.moveTo(px + pw * 0.25, py);
+        ctx.lineTo(px + pw * 0.38, py + ph);
+        ctx.moveTo(px + pw * 0.65, py);
         ctx.lineTo(px + pw * 0.78, py + ph);
         ctx.stroke();
       }
     } else if (plat.type === PLATFORM_TYPES.SPRING) {
+      // YAY MEKANİZMASI
       ctx.fillStyle = '#111827';
       const coils = 3;
       for (let c = 0; c < coils; c++) {
-        const cx = px + pw * (0.28 + c * 0.22);
-        ctx.fillRect(cx - 5 * scaleRatio, py + ph * 0.15, 10 * scaleRatio, 2 * scaleRatio);
-        ctx.fillRect(cx - 5 * scaleRatio, py + ph * 0.45, 10 * scaleRatio, 2 * scaleRatio);
-        ctx.fillRect(cx - 5 * scaleRatio, py + ph * 0.75, 10 * scaleRatio, 2 * scaleRatio);
+        const cx = px + pw * (0.32 + c * 0.18);
+        ctx.fillRect(cx - 5 * scaleRatio, py + ph * 0.25, 10 * scaleRatio, 3 * scaleRatio);
+        ctx.fillRect(cx - 5 * scaleRatio, py + ph * 0.55, 10 * scaleRatio, 3 * scaleRatio);
       }
-      ctx.fillStyle = '#fff7b0';
+      ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.moveTo(px + pw / 2, py - 6 * scaleRatio);
-      ctx.lineTo(px + pw / 2 - 7 * scaleRatio, py + 2 * scaleRatio);
-      ctx.lineTo(px + pw / 2 + 7 * scaleRatio, py + 2 * scaleRatio);
+      ctx.lineTo(px + pw / 2 - 8 * scaleRatio, py + 3 * scaleRatio);
+      ctx.lineTo(px + pw / 2 + 8 * scaleRatio, py + 3 * scaleRatio);
       ctx.closePath();
       ctx.fill();
     } else if (plat.type === PLATFORM_TYPES.BOOST) {
+      // ROKET OKLARI
       ctx.fillStyle = '#ffffff';
       for (let a = 0; a < 2; a++) {
-        const ay = py + 3 * scaleRatio + a * 6 * scaleRatio;
+        const ay = py + 4 * scaleRatio + a * 7 * scaleRatio;
         ctx.beginPath();
         ctx.moveTo(px + pw / 2, ay);
-        ctx.lineTo(px + pw / 2 - 8 * scaleRatio, ay + 6 * scaleRatio);
-        ctx.lineTo(px + pw / 2 + 8 * scaleRatio, ay + 6 * scaleRatio);
+        ctx.lineTo(px + pw / 2 - 10 * scaleRatio, ay + 6 * scaleRatio);
+        ctx.lineTo(px + pw / 2 + 10 * scaleRatio, ay + 6 * scaleRatio);
         ctx.closePath();
         ctx.fill();
       }
     } else if (plat.type === PLATFORM_TYPES.MOVING) {
-      ctx.fillStyle = '#ffd6f5';
+      // ÇİFT YÖNLÜ DİNAMİK OKLAR
+      ctx.fillStyle = '#ffffff';
       const midY = py + ph / 2;
       ctx.beginPath();
-      ctx.moveTo(px + 6 * scaleRatio, midY);
-      ctx.lineTo(px + 14 * scaleRatio, midY - 4 * scaleRatio);
-      ctx.lineTo(px + 14 * scaleRatio, midY + 4 * scaleRatio);
+      ctx.moveTo(px + 8 * scaleRatio, midY);
+      ctx.lineTo(px + 17 * scaleRatio, midY - 5 * scaleRatio);
+      ctx.lineTo(px + 17 * scaleRatio, midY + 5 * scaleRatio);
       ctx.closePath();
       ctx.fill();
       ctx.beginPath();
-      ctx.moveTo(px + pw - 6 * scaleRatio, midY);
-      ctx.lineTo(px + pw - 14 * scaleRatio, midY - 4 * scaleRatio);
-      ctx.lineTo(px + pw - 14 * scaleRatio, midY + 4 * scaleRatio);
+      ctx.moveTo(px + pw - 8 * scaleRatio, midY);
+      ctx.lineTo(px + pw - 17 * scaleRatio, midY - 5 * scaleRatio);
+      ctx.lineTo(px + pw - 17 * scaleRatio, midY + 5 * scaleRatio);
       ctx.closePath();
       ctx.fill();
     } else if (plat.type === PLATFORM_TYPES.PORTAL) {
       ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1.6 * scaleRatio;
+      ctx.lineWidth = 2 * scaleRatio;
       ctx.beginPath();
       ctx.ellipse(px + pw / 2, py + ph / 2, pw * 0.22, ph * 0.28, 0, 0, Math.PI * 2);
       ctx.stroke();
     } else if (plat.type === PLATFORM_TYPES.WIND) {
-      ctx.strokeStyle = '#e0f7fa';
-      ctx.lineWidth = 1.4 * scaleRatio;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2 * scaleRatio;
       ctx.beginPath();
-      ctx.moveTo(px + 8 * scaleRatio, py + 4 * scaleRatio);
-      ctx.quadraticCurveTo(px + pw * 0.4, py - 4 * scaleRatio, px + pw * 0.7, py + 5 * scaleRatio);
+      ctx.moveTo(px + 12 * scaleRatio, py + 6 * scaleRatio);
+      ctx.quadraticCurveTo(px + pw * 0.45, py - 4 * scaleRatio, px + pw * 0.8, py + 8 * scaleRatio);
       ctx.stroke();
     } else if (plat.type === PLATFORM_TYPES.BOMB) {
       ctx.fillStyle = plat.armed && Math.floor(gameTime * 2) % 2 === 0 ? '#ffffff' : '#111827';
       ctx.beginPath();
-      ctx.arc(px + pw / 2, py + ph / 2, 4 * scaleRatio, 0, Math.PI * 2);
+      ctx.arc(px + pw / 2, py + ph / 2, 5 * scaleRatio, 0, Math.PI * 2);
       ctx.fill();
     }
 
+    // Kat Göstergesi
     if (plat.floor > 0) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-      ctx.font = `700 ${9 * scaleRatio}px Segoe UI`;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.font = `800 ${10 * scaleRatio}px Segoe UI, Trebuchet MS, sans-serif`;
       ctx.textAlign = 'left';
-      ctx.fillText(`${plat.floor}F`, px + 6 * scaleRatio, py + ph - 3 * scaleRatio);
+      ctx.fillText(`${plat.floor}F`, px + 8 * scaleRatio, py + ph - 5 * scaleRatio);
     }
   }
 
@@ -4354,26 +4403,72 @@ function drawPlayer() {
     ctx.stroke();
   }
 
-  // ---- AKTİF GÜÇLENDİRİCİ GÖRSELLERİ (KALKAN & JETPACK) ----
+  // ---- AKTİF GÜÇLENDİRİCİ GÖRSELLERİ (KALKAN & JETPACK & MANYETİK HALE) ----
   if (activePowerUp && activePowerUp.type === 'shield') {
+    const shieldPulse = Math.sin(gameTime * 8) * 2 * scaleRatio;
+    const shieldRadius = Math.max(halfW, halfH) * 1.45 + shieldPulse;
+
+    ctx.save();
+    ctx.shadowColor = '#ff007f';
+    ctx.shadowBlur = 12 * scaleRatio;
     ctx.strokeStyle = '#ff007f';
-    ctx.lineWidth = 2.5 * scaleRatio;
+    ctx.lineWidth = 3 * scaleRatio;
     ctx.beginPath();
-    ctx.arc(0, 0, Math.max(halfW, halfH) * 1.35, 0, Math.PI * 2);
+    ctx.arc(0, 0, shieldRadius, 0, Math.PI * 2);
     ctx.stroke();
 
-    ctx.fillStyle = 'rgba(255, 0, 127, 0.15)';
+    ctx.fillStyle = 'rgba(255, 0, 127, 0.22)';
     ctx.beginPath();
-    ctx.arc(0, 0, Math.max(halfW, halfH) * 1.35, 0, Math.PI * 2);
+    ctx.arc(0, 0, shieldRadius, 0, Math.PI * 2);
     ctx.fill();
+
+    // Kalkan petek / parlama deseni
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.lineWidth = 1.5 * scaleRatio;
+    ctx.beginPath();
+    ctx.arc(-shieldRadius * 0.35, -shieldRadius * 0.35, shieldRadius * 0.45, Math.PI * 0.9, Math.PI * 1.8);
+    ctx.stroke();
+    ctx.restore();
   } else if (activePowerUp && activePowerUp.type === 'jetpack') {
+    // İki Yönlü Turbo Roket Motoru Çizimi
+    ctx.save();
+    // Motor Gövdesi
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(-halfW - 4 * scaleRatio, -halfH * 0.2, 5 * scaleRatio, halfH * 0.9);
+    ctx.fillRect(halfW - 1 * scaleRatio, -halfH * 0.2, 5 * scaleRatio, halfH * 0.9);
+
+    // Motor Alevleri
+    const flameH1 = (14 + Math.random() * 12) * scaleRatio;
+    const flameH2 = (14 + Math.random() * 12) * scaleRatio;
+
+    // Sol Alev
     ctx.fillStyle = Math.random() > 0.4 ? '#ffe600' : '#ff3700';
     ctx.beginPath();
-    ctx.moveTo(-6 * scaleRatio, halfH);
-    ctx.lineTo(0, halfH + (14 + Math.random() * 8) * scaleRatio);
-    ctx.lineTo(6 * scaleRatio, halfH);
+    ctx.moveTo(-halfW - 4 * scaleRatio, halfH * 0.7);
+    ctx.lineTo(-halfW - 1.5 * scaleRatio, halfH * 0.7 + flameH1);
+    ctx.lineTo(-halfW + 1 * scaleRatio, halfH * 0.7);
     ctx.closePath();
     ctx.fill();
+
+    // Sağ Alev
+    ctx.beginPath();
+    ctx.moveTo(halfW - 1 * scaleRatio, halfH * 0.7);
+    ctx.lineTo(halfW + 1.5 * scaleRatio, halfH * 0.7 + flameH2);
+    ctx.lineTo(halfW + 4 * scaleRatio, halfH * 0.7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  } else if (activePowerUp && activePowerUp.type === 'magnet') {
+    // Mıknatıs Çekim Halesi
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.65)';
+    ctx.lineWidth = 2 * scaleRatio;
+    ctx.setLineDash([6 * scaleRatio, 4 * scaleRatio]);
+    ctx.beginPath();
+    ctx.arc(0, 0, Math.max(halfW, halfH) * 1.35, gameTime * 4, gameTime * 4 + Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
   }
 
   ctx.restore();
