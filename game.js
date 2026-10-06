@@ -488,8 +488,8 @@ const sounds = new SoundSystem();
 // ==========================================
 const SHOP_ITEMS = {
   charShape: [
-    { id: 'shape_rect', name: 'Klasik Kutu 🔲', preview: 'rect', price: 0 },
-    { id: 'shape_slime', name: 'Slime Blob 💧', preview: 'slime', price: 0 },
+    { id: 'shape_rect', name: 'Klasik Kutu', preview: 'rect', price: 0 },
+    { id: 'shape_slime', name: 'Slime Blob', preview: 'slime', price: 0 },
   ],
   wallColor: [
     { id: 'wall_default', name: 'Neon Cyan', preview: '#00f0ff', price: 0 },
@@ -497,43 +497,43 @@ const SHOP_ITEMS = {
     { id: 'wall_green', name: 'Neon Yeşil', preview: '#00ff66', price: 5 },
     { id: 'wall_purple', name: 'Neon Mor', preview: '#9d00ff', price: 8 },
     { id: 'wall_orange', name: 'Neon Turuncu', preview: '#ff5e00', price: 8 },
-    { id: 'wall_rainbow', name: 'Gökkuşağı 🌈', preview: 'rainbow', price: 20 },
+    { id: 'wall_rainbow', name: 'Gökkuşağı', preview: 'rainbow', price: 20 },
   ],
   charColor: [
     { id: 'char_default', name: 'Neon Döngü', preview: 'cycle', price: 0 },
     { id: 'char_cyan', name: 'Sabit Cyan', preview: '#00f0ff', price: 5 },
     { id: 'char_pink', name: 'Sabit Pembe', preview: '#ff007f', price: 5 },
     { id: 'char_yellow', name: 'Sabit Sarı', preview: '#ffe600', price: 5 },
-    { id: 'char_rainbow', name: 'Gökkuşağı 🌈', preview: 'rainbow', price: 15 },
-    { id: 'char_fire', name: 'Ateş 🔥', preview: 'fire', price: 20 },
-    { id: 'char_electric', name: 'Elektrik ⚡', preview: 'electric', price: 25 },
-    { id: 'char_cosmic', name: 'Kozmik Süperstar 👑🌌', preview: 'cosmic', price: 150 },
+    { id: 'char_rainbow', name: 'Gökkuşağı', preview: 'rainbow', price: 15 },
+    { id: 'char_fire', name: 'Ateş Parıltısı', preview: 'fire', price: 20 },
+    { id: 'char_electric', name: 'Elektrik Kıvılcımı', preview: 'electric', price: 25 },
+    { id: 'char_cosmic', name: 'Kozmik Süperstar', preview: 'cosmic', price: 150 },
   ],
   trailStyle: [
-    { id: 'trail_drop', name: 'Damla 💧', preview: 'drop', price: 0 },
-    { id: 'trail_star', name: 'Yıldız ⭐', preview: 'star', price: 8 },
-    { id: 'trail_heart', name: 'Kalp 💖', preview: 'heart', price: 10 },
-    { id: 'trail_flame', name: 'Alev 🔥', preview: 'flame', price: 12 },
-    { id: 'trail_bubble', name: 'Baloncuk 🫧', preview: 'bubble', price: 14 },
-    { id: 'trail_lightning', name: 'Yıldırım ⚡', preview: 'lightning', price: 16 },
+    { id: 'trail_drop', name: 'Damla İzi', preview: 'drop', price: 0 },
+    { id: 'trail_star', name: 'Yıldız İzi', preview: 'star', price: 8 },
+    { id: 'trail_heart', name: 'Kalp İzi', preview: 'heart', price: 10 },
+    { id: 'trail_flame', name: 'Alev İzi', preview: 'flame', price: 12 },
+    { id: 'trail_bubble', name: 'Baloncuk İzi', preview: 'bubble', price: 14 },
+    { id: 'trail_lightning', name: 'Yıldırım İzi', preview: 'lightning', price: 16 },
   ],
   eyes: [
-    { id: 'eye_normal', name: 'Normal 👀', preview: 'normal', price: 0 },
-    { id: 'eye_angry', name: 'Kızgın 😠', preview: 'angry', price: 5 },
-    { id: 'eye_happy', name: 'Mutlu 😊', preview: 'happy', price: 5 },
-    { id: 'eye_sunglasses', name: 'Güneş Gözlüğü 😎', preview: 'sunglasses', price: 10 },
-    { id: 'eye_patch', name: 'Göz Bandı 🏴‍☠️', preview: 'patch', price: 12 },
-    { id: 'eye_cyclops', name: 'Cyclops 👁️', preview: 'cyclops', price: 15 },
-    { id: 'eye_laser', name: 'Robot Lazer 🤖', preview: 'laser', price: 18 },
+    { id: 'eye_normal', name: 'Normal Bakış', preview: 'normal', price: 0 },
+    { id: 'eye_angry', name: 'Öfkeli Bakış', preview: 'angry', price: 5 },
+    { id: 'eye_happy', name: 'Neşeli Bakış', preview: 'happy', price: 5 },
+    { id: 'eye_sunglasses', name: 'Cool Güneş Gözlüğü', preview: 'sunglasses', price: 10 },
+    { id: 'eye_patch', name: 'Korsan Bandı', preview: 'patch', price: 12 },
+    { id: 'eye_cyclops', name: 'Tepegöz Vizörü', preview: 'cyclops', price: 15 },
+    { id: 'eye_laser', name: 'Robot Lazer Gözü', preview: 'laser', price: 18 },
   ],
   hats: [
-    { id: 'hat_none', name: 'Yok ❌', preview: 'none', price: 0 },
-    { id: 'hat_crown', name: 'Taç 👑', preview: 'crown', price: 15 },
-    { id: 'hat_party', name: 'Parti 🎉', preview: 'party', price: 10 },
-    { id: 'hat_ninja', name: 'Ninja 🥷', preview: 'ninja', price: 12 },
-    { id: 'hat_helmet', name: 'Baret ⛑️', preview: 'helmet', price: 8 },
-    { id: 'hat_flower', name: 'Çiçek 🌸', preview: 'flower', price: 10 },
-    { id: 'hat_halo', name: 'Hale 😇', preview: 'halo', price: 20 },
+    { id: 'hat_none', name: 'Şapkasız', preview: 'none', price: 0 },
+    { id: 'hat_crown', name: 'Kraliyet Tacı', preview: 'crown', price: 15 },
+    { id: 'hat_party', name: 'Parti Külahı', preview: 'party', price: 10 },
+    { id: 'hat_ninja', name: 'Ninja Bandı', preview: 'ninja', price: 12 },
+    { id: 'hat_helmet', name: 'İşçi Bareti', preview: 'helmet', price: 8 },
+    { id: 'hat_flower', name: 'Bahar Çiçeği', preview: 'flower', price: 10 },
+    { id: 'hat_halo', name: 'Işık Halesi', preview: 'halo', price: 20 },
   ],
 };
 
@@ -714,19 +714,37 @@ class ShopSystem {
           previewHTML = `<div class="item-color-preview" style="background:${item.preview}; box-shadow: 0 0 12px ${item.preview};"></div>`;
         }
       } else {
-        // İkon bazlı (charShape, trail, eyes, hats)
-        const iconMap = {
+        // Vektör/SVG grafiksel önizlemeler (Emoji içermez)
+        const svgMap = {
           // Model / Shape
-          'rect': '🔲', 'slime': '💧',
+          'rect': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><rect x="4" y="4" width="24" height="24" rx="4" fill="#00f0ff" stroke="#fff" stroke-width="2"/><circle cx="11" cy="12" r="2.5" fill="#0f172a"/><circle cx="21" cy="12" r="2.5" fill="#0f172a"/></svg>',
+          'slime': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><path d="M16 4 C24 4 28 14 28 22 C28 27 23 28 16 28 C9 28 4 27 4 22 C4 14 8 4 16 4 Z" fill="#00ffaa" stroke="#fff" stroke-width="1.8"/><circle cx="12" cy="18" r="2" fill="#0f172a"/><circle cx="20" cy="18" r="2" fill="#0f172a"/></svg>',
           // Trail
-          'drop': '💧', 'star': '⭐', 'heart': '💖', 'flame': '🔥', 'bubble': '🫧', 'lightning': '⚡',
+          'drop': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><path d="M16 4 C16 4 6 16 6 22 A10 10 0 0 0 26 22 C26 16 16 4 16 4 Z" fill="#00c8ff"/></svg>',
+          'star': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><polygon points="16,2 20.5,11.5 31,13 23.5,20.5 25.5,31 16,26 6.5,31 8.5,20.5 1,13 11.5,11.5" fill="#ffd700" stroke="#ffaa00" stroke-width="1.5"/></svg>',
+          'heart': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><path d="M16 28 C16 28 3 20 3 10 A7 7 0 0 1 16 7 A7 7 0 0 1 29 10 C29 20 16 28 16 28 Z" fill="#ff0055"/></svg>',
+          'flame': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><path d="M16 2 C16 2 26 12 26 20 C26 26 21.5 30 16 30 C10.5 30 6 26 6 20 C6 14 11 8 16 2 Z" fill="#ff4400"/><path d="M16 12 C16 12 21 17 21 21 C21 24 18.5 27 16 27 C13.5 27 11 24 11 21 C11 18 13.5 15 16 12 Z" fill="#ffcc00"/></svg>',
+          'bubble': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><circle cx="16" cy="16" r="12" fill="rgba(0,240,255,0.3)" stroke="#00f0ff" stroke-width="2"/><circle cx="12" cy="11" r="3" fill="#ffffff"/></svg>',
+          'lightning': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><polygon points="18,2 6,17 15,17 13,30 26,13 17,13" fill="#ffe600" stroke="#ff8800" stroke-width="1.2"/></svg>',
           // Eyes
-          'normal': '👀', 'angry': '😠', 'happy': '😊', 'sunglasses': '😎', 'patch': '🏴‍☠️', 'cyclops': '👁️', 'laser': '🤖',
+          'normal': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><circle cx="10" cy="16" r="6" fill="#fff"/><circle cx="22" cy="16" r="6" fill="#fff"/><circle cx="11" cy="16" r="3" fill="#0f172a"/><circle cx="23" cy="16" r="3" fill="#0f172a"/></svg>',
+          'angry': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><circle cx="10" cy="17" r="5.5" fill="#fff"/><circle cx="22" cy="17" r="5.5" fill="#fff"/><circle cx="11" cy="17" r="3" fill="#ff0033"/><circle cx="23" cy="17" r="3" fill="#ff0033"/><line x1="5" y1="10" x2="14" y2="13" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><line x1="27" y1="10" x2="18" y2="13" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
+          'happy': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><path d="M7 18 Q 11 11 15 18" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M17 18 Q 21 11 25 18" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>',
+          'sunglasses': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><rect x="4" y="11" width="10" height="9" rx="2" fill="#1e293b" stroke="#00f0ff" stroke-width="1.5"/><rect x="18" y="11" width="10" height="9" rx="2" fill="#1e293b" stroke="#00f0ff" stroke-width="1.5"/><line x1="14" y1="15" x2="18" y2="15" stroke="#00f0ff" stroke-width="2"/></svg>',
+          'patch': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><line x1="4" y1="9" x2="28" y2="21" stroke="#334155" stroke-width="2.5"/><circle cx="11" cy="15" r="6" fill="#111827" stroke="#475569" stroke-width="1.5"/><circle cx="22" cy="16" r="5.5" fill="#fff"/><circle cx="23" cy="16" r="2.8" fill="#0f172a"/></svg>',
+          'cyclops': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><circle cx="16" cy="16" r="10" fill="#fff" stroke="#475569" stroke-width="1.5"/><circle cx="17" cy="16" r="5" fill="#0f172a"/><circle cx="14" cy="13" r="2" fill="#fff"/></svg>',
+          'laser': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><rect x="4" y="12" width="24" height="8" rx="3" fill="#1e293b" stroke="#ff0055" stroke-width="1.5"/><rect x="12" y="14" width="8" height="4" rx="2" fill="#ff0055"/></svg>',
           // Hats
-          'none': '❌', 'crown': '👑', 'party': '🎉', 'ninja': '🥷', 'helmet': '⛑️', 'flower': '🌸', 'halo': '😇',
+          'none': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><circle cx="16" cy="16" r="10" fill="none" stroke="#64748b" stroke-width="2"/><line x1="9" y1="9" x2="23" y2="23" stroke="#ef4444" stroke-width="2.5"/></svg>',
+          'crown': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><polygon points="5,24 6,10 11,16 16,7 21,16 26,10 27,24" fill="#ffd700" stroke="#b45309" stroke-width="1.5"/><circle cx="16" cy="10" r="1.5" fill="#ff0055"/></svg>',
+          'party': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><polygon points="16,3 8,26 24,26" fill="#ff007f" stroke="#ffe600" stroke-width="1.5"/><circle cx="16" cy="4" r="2.5" fill="#ffe600"/></svg>',
+          'ninja': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><rect x="4" y="12" width="24" height="7" rx="2" fill="#18181b" stroke="#ef4444" stroke-width="1.2"/><path d="M26 16 C30 18 31 24 29 27" stroke="#18181b" stroke-width="2.5" fill="none"/></svg>',
+          'helmet': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><path d="M6 21 C6 12 11 8 16 8 C21 8 26 12 26 21 Z" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"/><rect x="4" y="21" width="24" height="4" rx="1.5" fill="#d97706"/></svg>',
+          'flower': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><circle cx="16" cy="11" r="3.5" fill="#ec4899"/><circle cx="21" cy="15" r="3.5" fill="#ec4899"/><circle cx="19" cy="20" r="3.5" fill="#ec4899"/><circle cx="13" cy="20" r="3.5" fill="#ec4899"/><circle cx="11" cy="15" r="3.5" fill="#ec4899"/><circle cx="16" cy="16" r="3" fill="#facc15"/></svg>',
+          'halo': '<svg viewBox="0 0 32 32" class="shop-svg-icon"><ellipse cx="16" cy="14" rx="11" ry="5" fill="none" stroke="#facc15" stroke-width="2.8"/><ellipse cx="16" cy="14" rx="11" ry="5" fill="rgba(250,204,21,0.2)"/></svg>',
         };
-        const icon = iconMap[item.preview] || '❓';
-        previewHTML = `<div class="item-icon-preview">${icon}</div>`;
+        const svgContent = svgMap[item.preview] || '<span class="shop-icon-fallback">★</span>';
+        previewHTML = `<div class="item-icon-preview">${svgContent}</div>`;
       }
 
       let actionHTML = '';
@@ -1581,15 +1599,23 @@ class BossEnemy {
     this.y = y;
     this.width = 76;
     this.height = 42;
-    this.vx = isFinal ? 2.3 : 1.7;
+    this.baseSpeed = isFinal ? 2.6 : 1.9;
+    this.vx = this.baseSpeed;
     this.maxHp = isFinal ? 4 : 3;
     this.hp = this.maxHp;
     this.isFinal = isFinal;
-    this.name = isFinal ? "TITAN CYBORG" : "MEGA MECH";
+    this.name = isFinal ? "TITAN CYBORG" : "MECHA GUARDIAN";
     this.defeated = false;
     this.defeatTimer = 0;
     this.flashTimer = 0;
     this.walkPhase = 0;
+    
+    // Boss mekanikleri: Uyarı, saldırı şarjı ve şok dalgası
+    this.attackTimer = 0;
+    this.attackCooldown = 180; // ~3 saniyede bir özel saldırı modu
+    this.isTelegraphing = false;
+    this.isCharging = false;
+    this.telegraphTimer = 0;
   }
 
   update() {
@@ -1599,12 +1625,39 @@ class BossEnemy {
     }
     if (this.flashTimer > 0) this.flashTimer--;
 
+    this.attackTimer++;
+    if (!this.isTelegraphing && !this.isCharging && this.attackTimer >= this.attackCooldown) {
+      this.isTelegraphing = true;
+      this.telegraphTimer = 45; // 0.75 saniye kırmızı lazer uyarısı
+      this.attackTimer = 0;
+      shake(3);
+      vibrate(15);
+    }
+
+    if (this.isTelegraphing) {
+      this.telegraphTimer--;
+      if (this.telegraphTimer <= 0) {
+        this.isTelegraphing = false;
+        this.isCharging = true;
+        this.chargeTimer = 40; // Hızlı depar
+        this.vx = (this.vx > 0 ? 1 : -1) * (this.baseSpeed * 2.5);
+        shake(6);
+        vibrate([20, 20]);
+      }
+    } else if (this.isCharging) {
+      this.chargeTimer--;
+      if (this.chargeTimer <= 0) {
+        this.isCharging = false;
+        this.vx = (this.vx > 0 ? 1 : -1) * this.baseSpeed;
+      }
+    }
+
     this.x += this.vx;
-    if (this.x < 24) {
-      this.x = 24;
+    if (this.x < 20) {
+      this.x = 20;
       this.vx = Math.abs(this.vx);
-    } else if (this.x > VIRTUAL_WIDTH - 24 - this.width) {
-      this.x = VIRTUAL_WIDTH - 24 - this.width;
+    } else if (this.x > VIRTUAL_WIDTH - 20 - this.width) {
+      this.x = VIRTUAL_WIDTH - 20 - this.width;
       this.vx = -Math.abs(this.vx);
     }
     this.walkPhase += 0.2;
@@ -1629,20 +1682,40 @@ class BossEnemy {
 
     const isFlashing = this.flashTimer > 0 && Math.floor(this.flashTimer / 2) % 2 === 0;
 
+    // Lazer / Şarj Uyarısı Telegrafi (Telegraph Beam)
+    if (this.isTelegraphing) {
+      ctx.save();
+      ctx.strokeStyle = Math.floor(Date.now() / 60) % 2 === 0 ? 'rgba(255, 0, 80, 0.9)' : 'rgba(255, 255, 255, 0.6)';
+      ctx.lineWidth = 3 * scaleRatio;
+      ctx.setLineDash([6 * scaleRatio, 4 * scaleRatio]);
+      const beamDir = this.vx > 0 ? 1 : -1;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(beamDir * 180 * scaleRatio, 0);
+      ctx.stroke();
+      ctx.restore();
+    }
+
     // HP Bar ve Canavar İsmi
-    const hpBarW = 56 * scaleRatio;
-    const hpBarH = 6 * scaleRatio;
-    const hpBarY = -this.height * 0.65 * scaleRatio - 12 * scaleRatio;
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
-    ctx.fillRect(-hpBarW / 2, hpBarY, hpBarW, hpBarH);
-    ctx.fillStyle = this.isFinal ? '#ff0055' : '#00ff66';
+    const hpBarW = 64 * scaleRatio;
+    const hpBarH = 7 * scaleRatio;
+    const hpBarY = -this.height * 0.65 * scaleRatio - 14 * scaleRatio;
+    
+    // HP Arka Plan
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.roundRect(-hpBarW / 2 - 2 * scaleRatio, hpBarY - 2 * scaleRatio, hpBarW + 4 * scaleRatio, hpBarH + 4 * scaleRatio, 3 * scaleRatio);
+    ctx.fill();
+
+    // HP Doluluk
+    ctx.fillStyle = this.hp === 1 ? '#ff0033' : (this.isFinal ? '#ff007f' : '#00ffaa');
     const hpFill = Math.max(0, (this.hp / this.maxHp) * hpBarW);
     ctx.fillRect(-hpBarW / 2, hpBarY, hpFill, hpBarH);
 
     ctx.font = `900 ${11 * scaleRatio}px Trebuchet MS, sans-serif`;
-    ctx.fillStyle = '#ffe600';
+    ctx.fillStyle = this.isCharging ? '#ff0033' : '#ffe600';
     ctx.textAlign = 'center';
-    ctx.fillText(`${this.name} (${this.hp}/${this.maxHp})`, 0, hpBarY - 4 * scaleRatio);
+    const tag = this.isCharging ? '⚡ ŞARJ SALDIRISI! ⚡' : `${this.name} (${this.hp}/${this.maxHp})`;
+    ctx.fillText(tag, 0, hpBarY - 5 * scaleRatio);
 
     // Robot Gövdesi (Mech Body)
     const w = this.width * scaleRatio;
@@ -1650,9 +1723,9 @@ class BossEnemy {
     const halfW = w / 2;
     const halfH = h / 2;
 
-    ctx.fillStyle = isFlashing ? '#ffffff' : (this.isFinal ? '#2e1065' : '#1e293b');
-    ctx.strokeStyle = this.isFinal ? '#ff007f' : '#00f0ff';
-    ctx.lineWidth = 2.5 * scaleRatio;
+    ctx.fillStyle = isFlashing ? '#ffffff' : (this.isFinal ? '#2e1065' : (this.isCharging ? '#450a0a' : '#1e293b'));
+    ctx.strokeStyle = this.isCharging ? '#ff0033' : (this.isFinal ? '#ff007f' : '#00f0ff');
+    ctx.lineWidth = (this.isCharging ? 3.5 : 2.5) * scaleRatio;
 
     ctx.beginPath();
     ctx.roundRect(-halfW, -halfH, w, h, 6 * scaleRatio);
@@ -1660,7 +1733,7 @@ class BossEnemy {
     ctx.stroke();
 
     // Lazer Vizör (Glowing eye visor)
-    ctx.fillStyle = this.isFinal ? '#ff0055' : '#00f0ff';
+    ctx.fillStyle = this.isCharging ? '#ffea00' : (this.isFinal ? '#ff0055' : '#00f0ff');
     ctx.fillRect(-halfW * 0.65, -halfH * 0.25, w * 0.65, 7 * scaleRatio);
 
     // Yan Omuzluklar & Zırh
@@ -2451,9 +2524,15 @@ function generateMorePlatforms() {
         mysteryCrates.push(new MysteryCrate(nextFloor, nextY + 36));
       }
 
-      // Kat 50 ve 100 Mini-Boss / Titan Boss Karşılaşması!
-      if (nextFloor === 50 && !bossEnemies.some(b => b.floor === 50)) {
+      // Kat 25, 50, 75 Mini-Boss ve Kat 100 Titan Boss Karşılaşması!
+      if (nextFloor === 25 && !bossEnemies.some(b => b.floor === 25)) {
+        bossEnemies.push(new BossEnemy(25, nextY - 15, false));
+        floatingTexts.push(new FloatingText("⚠️ ELEBAŞI YAKLAŞIYOR!", VIRTUAL_WIDTH / 2, nextY - 50, '#ff0055'));
+      } else if (nextFloor === 50 && !bossEnemies.some(b => b.floor === 50)) {
         bossEnemies.push(new BossEnemy(50, nextY - 15, false));
+        floatingTexts.push(new FloatingText("⚠️ MEGA MECH YAKLAŞIYOR!", VIRTUAL_WIDTH / 2, nextY - 50, '#ff0055'));
+      } else if (nextFloor === 75 && !bossEnemies.some(b => b.floor === 75)) {
+        bossEnemies.push(new BossEnemy(75, nextY - 15, false));
         floatingTexts.push(new FloatingText("⚠️ ELEBAŞI YAKLAŞIYOR!", VIRTUAL_WIDTH / 2, nextY - 50, '#ff0055'));
       } else if (nextFloor === 100 && !bossEnemies.some(b => b.floor === 100)) {
         bossEnemies.push(new BossEnemy(100, nextY - 15, true));
@@ -2601,21 +2680,16 @@ function collectLootOnPlatform(plat) {
 
 function performWallKick(dir, manual = false) {
   // dir: -1 sol duvardan sağa doğru, 1 sağ duvardan sola doğru
-  if (player.lastWallKickDir === dir) {
-    if (player.wallKickCount >= 2) {
-      player.vx = 0;
-      player.vy = Math.max(player.vy, 2);
-      if (!player.wallWarnShown) {
-        player.wallWarnShown = true;
-        floatingTexts.push(new FloatingText("BASAMAĞA BAS! 🧗", dir === -1 ? player.x + 50 : player.x - 50, player.y, '#ff4444'));
-      }
-      return false;
-    }
-  } else {
-    // Farklı duvara geçti - ardışık aynı duvar sayacını sıfırla
+  if (player.lastWallKickDir !== dir) {
+    // Farklı duvara geçti - sayaç sıfırlanır
     player.wallKickCount = 0;
     player.wallWarnShown = false;
   }
+
+  // Duvar tekmesinde grounded durumunu ve buz beklemesini anında kaldır
+  player.isGrounded = false;
+  player.coyoteTimer = 0;
+  player.iceHopTimer = 0;
 
   const isPerfect = manual && player.wallContactFrames <= 8;
   const kickVyBase = isPerfect ? -17.5 : -16.0;
@@ -2629,15 +2703,15 @@ function performWallKick(dir, manual = false) {
   player.rotation = dir === -1 ? 360 : -360;
   player.scaleX = 0.55;
   player.scaleY = 1.5;
-  player.wallKickLockTimer = 12; // Directional momentum lock to ensure clean launch
+  player.wallKickLockTimer = 10; // Directional momentum lock to ensure clean launch
   
   // Duvara yapışmayı önlemek için içeri it
   const leftBorder = 16;
   const rightBorder = VIRTUAL_WIDTH - 16 - player.width;
   if (dir === -1) {
-    player.x = Math.max(player.x, leftBorder + 6);
+    player.x = Math.max(player.x, leftBorder + 8);
   } else {
-    player.x = Math.min(player.x, rightBorder - 6);
+    player.x = Math.min(player.x, rightBorder - 8);
   }
 
   sounds.wallKick();
@@ -2663,7 +2737,7 @@ function performWallKick(dir, manual = false) {
 }
 
 function checkWallKickOnInput(manual = true) {
-  if (currentState !== GAME_STATE.PLAYING || player.isGrounded) return false;
+  if (currentState !== GAME_STATE.PLAYING) return false;
   const leftBorder = 32;
   const rightBorder = VIRTUAL_WIDTH - 32 - player.width;
   if (player.x <= leftBorder) {
@@ -2822,12 +2896,13 @@ function startGame() {
       if (timeVal) timeVal.textContent = `Hedef: K.${stage.targetFloor}`;
     }
   } else if (selectedMode === GAME_MODES.HELL) {
-    lavaY = 980;
-    lavaSpeed = 0.42;
+    lavaY = 920;
+    lavaSpeed = 0.58;
     if (timeBadge) timeBadge.classList.add('hidden');
   } else {
-    lavaY = 1180;
-    lavaSpeed = 0.18;
+    // Normal Lav Modu
+    lavaY = 960;
+    lavaSpeed = 0.48;
     if (timeBadge) timeBadge.classList.add('hidden');
   }
 
@@ -2988,7 +3063,7 @@ function update() {
   if (player.x <= leftBorder) {
     player.x = leftBorder;
     player.wallContactFrames++;
-    if (!player.isGrounded && player.wallKickLockTimer === 0) {
+    if (player.wallKickLockTimer === 0) {
       performWallKick(-1);
     } else {
       player.vx = 0;
@@ -2996,7 +3071,7 @@ function update() {
   } else if (player.x >= rightBorder) {
     player.x = rightBorder;
     player.wallContactFrames++;
-    if (!player.isGrounded && player.wallKickLockTimer === 0) {
+    if (player.wallKickLockTimer === 0) {
       performWallKick(1);
     } else {
       player.vx = 0;
@@ -3426,6 +3501,10 @@ function update() {
         emitParticles(boss.x + boss.width / 2, boss.y, 35, '#00f0ff', 7);
         addCombo(boss.x + boss.width / 2, boss.y);
         addCombo(boss.x + boss.width / 2, boss.y);
+        // Boss ödülü olarak süper roket güçlendiricisi ver!
+        activePowerUp = { type: POWER_UP_TYPES.JETPACK, timer: 210, maxTimer: 210 };
+        updateActivePowerUpUI();
+        floatingTexts.push(new FloatingText("🚀 SÜPER ROKET KAZANDIN!", VIRTUAL_WIDTH / 2, boss.y - 65, '#ffe600'));
       } else {
         floatingTexts.push(new FloatingText(`-1 CAN! 💥 (${boss.hp}/${boss.maxHp})`, boss.x + boss.width / 2, boss.y - 20, '#ffe600'));
       }
@@ -3545,11 +3624,17 @@ function update() {
     const isFrozen = activePowerUp && activePowerUp.type === 'freeze';
     if (!isFrozen) {
       const isHell = selectedMode === GAME_MODES.HELL;
-      const levelLavaBoost = selectedMode === GAME_MODES.LEVELS && currentLevelId >= 30 ? 0.18 : 0;
-      const floorFactor = Math.min(player.highestFloor * (isHell ? 0.035 : 0.016), 2.2);
-      const timeFactor = Math.min(gameTime * (isHell ? 0.010 : 0.004), 1.2);
-      const baseSpeed = isHell ? 0.42 : (selectedMode === GAME_MODES.LEVELS ? 0.14 : 0.18);
-      lavaSpeed = baseSpeed + floorFactor + timeFactor + levelLavaBoost;
+      const levelLavaBoost = selectedMode === GAME_MODES.LEVELS && currentLevelId >= 30 ? 0.28 : 0;
+      const floorFactor = Math.min(player.highestFloor * (isHell ? 0.045 : 0.024), 2.8);
+      const timeFactor = Math.min(gameTime * (isHell ? 0.015 : 0.008), 1.8);
+      const baseSpeed = isHell ? 0.58 : (selectedMode === GAME_MODES.LEVELS ? 0.28 : 0.48);
+      
+      // Oyuncu lavdan çok uzaklaştığında yetişme (catch-up) ivmesi
+      const playerBottom = player.y + player.height;
+      const distAbove = lavaY - playerBottom;
+      const catchupSpeed = distAbove > 360 ? Math.min(2.4, (distAbove - 360) * 0.007) : 0;
+
+      lavaSpeed = baseSpeed + floorFactor + timeFactor + levelLavaBoost + catchupSpeed;
       lavaY -= lavaSpeed;
 
       // Lavdan yükselen alev kıvılcımları (Embers - Hafif ve donma yapmayan frekans)
